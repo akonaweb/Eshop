@@ -17,12 +17,15 @@ namespace Eshop.Domain.Tests
             // act
             var sut = new Product(id, title, description, price, category);
 
-            // assert
-            Assert.That(sut.Id, Is.EqualTo(id));
-            Assert.That(sut.Title, Is.EqualTo(title));
-            Assert.That(sut.Description, Is.EqualTo(description));
-            Assert.That(sut.Price, Is.EqualTo(price));
-            Assert.That(sut.Category, Is.EqualTo(category));
+            Assert.Multiple(() =>
+            {
+                // assert
+                Assert.That(sut.Id, Is.EqualTo(id));
+                Assert.That(sut.Title, Is.EqualTo(title));
+                Assert.That(sut.Description, Is.EqualTo(description));
+                Assert.That(sut.Price, Is.EqualTo(price));
+                Assert.That(sut.Category, Is.EqualTo(category));
+            });
         }
 
         [Test]
@@ -32,149 +35,64 @@ namespace Eshop.Domain.Tests
             Assert.Throws<ArgumentOutOfRangeException>(() => new Product(-1, "Title", "Description", 1200, null));
         }
 
-        [Test]
-        public void Product_WithNullTitleParam_ThrowsException()
+        // Title property
+        [TestCase(null, "Description", 0)]
+        [TestCase(" ", "Description", 0)]
+        [TestCase("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxy", "Description", 0)] // 51 chars
+        // Description property
+        [TestCase("Title", null, 0)]
+        [TestCase("Title", " ", 0)]
+        [TestCase("Title", "ZbrEmS4KqO8JzyA13tdYtvb5b3B7WFiIej0PdgMlnQyC2tnS5OfVsf0boGoPpJ8YmdnEhDVBoBuE1fjKDAHwhDZnBdxQNmRzUH0SRk44sBcu4yMO3pdu63UBdXiWi02Q7nFDaNRpx3Nyi9YGeRO2L48wR3dTbhuJDVz4KwhnV89K3WW8QXpL2dFdZz0CDRTWsxNWq48x6hsgQiX4IOvMob6qVIOLfHIrUT8kSCNevxqzTRynAKrwoxkCLcEgYq7u699PupVYTbP8es3X8YvtehAP8IYA89T1AfScBA0yrhgke4OKPR9HdG6crui42yN2aINCqhPqpMPKdyAVgU7XdQFD2UYSIvDAdBWS6XJk0ftiAkrVRWZC8nK5InU49ALqAOtwVxFeo3Eevszr9sMKcYtnYQtwc6RDHnhjCz8VWViyfludPkwFQ2yJqF6jHucTl9PNZXrhG03iwzzan22clBSqjcLd2l90fcHK10ZbxyYlwm2pHv8xi", 0)] // 501 chars
+        // Price property
+        [TestCase("Title", "Description", -1)]
+        public void Product_WithInvalidParams_ThrowsException(string? title, string? description, decimal price)
         {
+            var t = StringUtils.GenerateRandomString(501);
             // act/assert
-            Assert.Throws<ArgumentNullException>(() => new Product(0, null!, "Description", 1200, null));
-        }
-
-        [Test]
-        public void Product_WithEmptyTitleParam_ThrowsException()
-        {
-            // act/assert
-            Assert.Throws<ArgumentNullException>(() => new Product(0, " ", "Description", 1200, null));
-        }
-
-        [Test]
-        public void Product_WithLongTitleParam_ThrowsException()
-        {
-            // act/assert
-            Assert.Throws<ArgumentNullException>(() => new Product(0, StringUtils.GenerateRandomString(51), "Description", 1200, null));
-        }
-
-        [Test]
-        public void Product_WithNullDesriptionParam_ThrowsException()
-        {
-            // act/assert
-            Assert.Throws<ArgumentNullException>(() => new Product(0, "Title", null!, 1200, null));
-        }
-
-        [Test]
-        public void Product_WithEmptyDescriptionParam_ThrowsException()
-        {
-            // act/assert
-            Assert.Throws<ArgumentNullException>(() => new Product(0, "Title", " ", 1200, null));
-        }
-
-        [Test]
-        public void Product_WithLongDescriptionParam_ThrowsException()
-        {
-            // act/assert
-            Assert.Throws<ArgumentNullException>(() => new Product(0, "Title", StringUtils.GenerateRandomString(501), 1200, null));
-        }
-
-        [Test]
-        public void Product_WithNegativePriceParam_ThrowsException()
-        {
-            // act/assert
-            Assert.Throws<ArgumentNullException>(() => new Product(0, "Title", "Description", -1, null));
+            Assert.Throws<ArgumentNullException>(() => new Product(0, title!, description!, price, null));
         }
 
         [Test]
         public void ProductUpdate_WithValidParams_SetCorrectlyProperties()
         {
             // arrange
-            var id = 0; // Zero is valid for a new object (EF)
-            var title = StringUtils.GenerateRandomString(50);
-            var description = StringUtils.GenerateRandomString(500);
-            var price = 0; // Zero is allowed
-            var category = new Category(0, "Notebooks");
-
             var newTitle = StringUtils.GenerateRandomString(50);
             var newDescription = StringUtils.GenerateRandomString(500);
             var newPrice = 1;
             var newCategory = new Category(1, "Mouses");
+            var sut = new Product(0, StringUtils.GenerateRandomString(50), StringUtils.GenerateRandomString(500), 0, new Category(0, "Notebooks"));
 
             // act
-            var sut = new Product(id, title, description, price, category);
             sut.Update(newTitle, newDescription, newPrice, newCategory);
 
-            // assert
-            Assert.That(sut.Title, Is.EqualTo(newTitle));
-            Assert.That(sut.Description, Is.EqualTo(newDescription));
-            Assert.That(sut.Price, Is.EqualTo(newPrice));
-            Assert.That(sut.Category, Is.EqualTo(newCategory));
+            Assert.Multiple(() =>
+            {
+                // assert
+                Assert.That(sut.Title, Is.EqualTo(newTitle));
+                Assert.That(sut.Description, Is.EqualTo(newDescription));
+                Assert.That(sut.Price, Is.EqualTo(newPrice));
+                Assert.That(sut.Category, Is.EqualTo(newCategory));
+            });
         }
 
-        [Test]
-        public void ProductUpdate_WithNullTitleParam_ThrowsException()
+
+        // Title property
+        [TestCase(null, "Description", 0)]
+        [TestCase(" ", "Description", 0)]
+        [TestCase("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxy", "Description", 0)] // 51 chars
+        // Description property
+        [TestCase("Title", null, 0)]
+        [TestCase("Title", " ", 0)]
+        [TestCase("Title", "ZbrEmS4KqO8JzyA13tdYtvb5b3B7WFiIej0PdgMlnQyC2tnS5OfVsf0boGoPpJ8YmdnEhDVBoBuE1fjKDAHwhDZnBdxQNmRzUH0SRk44sBcu4yMO3pdu63UBdXiWi02Q7nFDaNRpx3Nyi9YGeRO2L48wR3dTbhuJDVz4KwhnV89K3WW8QXpL2dFdZz0CDRTWsxNWq48x6hsgQiX4IOvMob6qVIOLfHIrUT8kSCNevxqzTRynAKrwoxkCLcEgYq7u699PupVYTbP8es3X8YvtehAP8IYA89T1AfScBA0yrhgke4OKPR9HdG6crui42yN2aINCqhPqpMPKdyAVgU7XdQFD2UYSIvDAdBWS6XJk0ftiAkrVRWZC8nK5InU49ALqAOtwVxFeo3Eevszr9sMKcYtnYQtwc6RDHnhjCz8VWViyfludPkwFQ2yJqF6jHucTl9PNZXrhG03iwzzan22clBSqjcLd2l90fcHK10ZbxyYlwm2pHv8xi", 0)] // 501 chars
+        // Price property
+        [TestCase("Title", "Description", -1)]
+        public void ProductUpdate_WithInvalidParams_ThrowsException(string? title, string? description, decimal price)
         {
             // arrange
-            var sut = new Product(0, "Title", "Description", 1200, null);
+            var sut = new Product(0, "Title", "Description", 1200, new Category(0, "Notebooks"));
 
             // act/assert
-            Assert.Throws<ArgumentNullException>(() => sut.Update(null!, "Description", 1200, null));
-        }
-
-        [Test]
-        public void ProductUpdate_WithEmptyTitleParam_ThrowsException()
-        {
-            // arrange
-            var sut = new Product(0, "Title", "Description", 1200, null);
-
-            // act/assert
-            Assert.Throws<ArgumentNullException>(() => sut.Update(" ", "Description", 1200, null));
-        }
-
-        [Test]
-        public void ProductUpdate_WithLongTitleParam_ThrowsException()
-        {
-            // arrange
-            var sut = new Product(0, "Title", "Description", 1200, null);
-
-            // act/assert
-            Assert.Throws<ArgumentNullException>(() => sut.Update(StringUtils.GenerateRandomString(51), "Description", 1200, null));
-        }
-
-        [Test]
-        public void ProductUpdate_WithNullDesriptionParam_ThrowsException()
-        {
-            // arrange
-            var sut = new Product(0, "Title", "Description", 1200, null);
-
-            // act/assert
-            Assert.Throws<ArgumentNullException>(() => sut.Update("Title", null!, 1200, null));
-        }
-
-        [Test]
-        public void ProductUpdate_WithEmptyDescriptionParam_ThrowsException()
-        {
-            // arrange
-            var sut = new Product(0, "Title", "Description", 1200, null);
-
-            // act/assert
-            Assert.Throws<ArgumentNullException>(() => sut.Update("Title", " ", 1200, null));
-        }
-
-        [Test]
-        public void ProductUpdate_WithLongDescriptionParam_ThrowsException()
-        {
-            // arrange
-            var sut = new Product(0, "Title", "Description", 1200, null);
-
-            // act/assert
-            Assert.Throws<ArgumentNullException>(() => sut.Update("Title", StringUtils.GenerateRandomString(501), 1200, null));
-        }
-
-        [Test]
-        public void ProductUpdate_WithNegativePriceParam_ThrowsException()
-        {
-            // arrange
-            var sut = new Product(0, "Title", "Description", 1200, null);
-
-            // act/assert
-            Assert.Throws<ArgumentNullException>(() => sut.Update("Title", "Description", -1, null));
+            Assert.Throws<ArgumentNullException>(() => sut.Update(title!, description!, price, null));
         }
     }
 }
