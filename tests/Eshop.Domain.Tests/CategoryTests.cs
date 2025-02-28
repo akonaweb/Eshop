@@ -14,9 +14,12 @@ namespace Eshop.Domain.Tests
             // act
             var sut = new Category(id, name);
 
-            // assert
-            Assert.That(sut.Id, Is.EqualTo(id));
-            Assert.That(sut.Name, Is.EqualTo(name));
+            Assert.Multiple(() =>
+            {
+                // assert
+                Assert.That(sut.Id, Is.EqualTo(id));
+                Assert.That(sut.Name, Is.EqualTo(name));
+            });
         }
 
         [Test]
@@ -40,13 +43,13 @@ namespace Eshop.Domain.Tests
         {
             // arrange
             var newCategoryName = StringUtils.GenerateRandomString(50);
-            var category = new Category(0, "Notebook");
+            var sut = new Category(0, "Notebook");
 
             // act
-            category.Udpate(newCategoryName);
+            sut.Udpate(newCategoryName);
 
             // assert
-            Assert.That(category.Name, Is.EqualTo(newCategoryName));
+            Assert.That(sut.Name, Is.EqualTo(newCategoryName));
         }
 
         [TestCase(null)]
@@ -55,10 +58,10 @@ namespace Eshop.Domain.Tests
         public void CategoryUpdate_WithInvalidParams_ThrowsException(string? newCategoryName)
         {
             // arrange
-            var category = new Category(0, "Notebook");
+            var sut = new Category(0, "Notebook");
 
             // act/assert
-            Assert.Throws<ArgumentNullException>(() => category.Udpate(newCategoryName!));
+            Assert.Throws<ArgumentNullException>(() => sut.Udpate(newCategoryName!));
         }
     }
 }
