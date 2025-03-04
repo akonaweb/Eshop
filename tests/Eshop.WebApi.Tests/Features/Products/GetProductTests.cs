@@ -1,4 +1,5 @@
 ﻿using Eshop.Domain;
+using Eshop.WebApi.Exceptions;
 using Eshop.WebApi.Features.Products;
 using Snapper;
 
@@ -36,7 +37,7 @@ namespace Eshop.WebApi.Tests.Features.Products
             var handler = new GetProduct.Handler(dbContext);
 
             // assert
-            Assert.ThrowsAsync<Exceptions.NotFoundException>(() => handler.Handle(query, CancellationToken.None));
+            Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(query, CancellationToken.None));
         }
     }
 }
