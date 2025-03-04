@@ -1,10 +1,11 @@
 ﻿using Eshop.Domain;
+using Eshop.WebApi.Exceptions;
 using Eshop.WebApi.Features.Products;
 using Snapper;
 
 namespace Eshop.WebApi.Tests.Features.Products
 {
-    public class GetProductsTests : TestBase
+    public class GetProductTests : TestBase
     {
         [SetUp]
         public async Task Seed()
@@ -15,17 +16,28 @@ namespace Eshop.WebApi.Tests.Features.Products
         }
 
         [Test]
-        public async Task GetProducts_ReturnsCorrectDto()
+        public async Task GetProduct_ReturnsCorrectDto()
         {
             // arrange
-            var query = new GetProducts.Query();
-            var handler = new GetProducts.Handler(dbContext);
+            var query = new GetProduct.Query(1);
+            var handler = new GetProduct.Handler(dbContext);
 
             // act
             var sut = await handler.Handle(query, CancellationToken.None);
 
             // assert
             sut.ShouldMatchSnapshot();
+        }
+
+        [Test]
+        public void GetProduct_ThrowsNotFoundException()
+        {
+            // act
+            var query = new GetProduct.Query(2);
+            var handler = new GetProduct.Handler(dbContext);
+
+            // assert
+            Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(query, CancellationToken.None));
         }
     }
 }

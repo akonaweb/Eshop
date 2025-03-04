@@ -4,22 +4,27 @@ using Snapper;
 
 namespace Eshop.WebApi.Tests.Features.Products
 {
-    public class GetProductsTests : TestBase
+    public class AddProductTests : TestBase
     {
         [SetUp]
         public async Task Seed()
         {
             var category = await dbContext.Categories.AddAsync(new Category(0, "Category 1"));
-            await dbContext.Products.AddAsync(new Product(0, "Title", "Description", 1, category.Entity));
             await dbContext.SaveChangesAsync(CancellationToken.None);
         }
 
         [Test]
-        public async Task GetProducts_ReturnsCorrectDto()
+        public async Task AddProducts_ReturnsCorrectDto()
         {
             // arrange
-            var query = new GetProducts.Query();
-            var handler = new GetProducts.Handler(dbContext);
+            var query = new AddProduct.Command(new AddProductRequestDto
+            {
+                Title = "Title",
+                Description = "Description",
+                Price = 1,
+                CategoryId = 1
+            });
+            var handler = new AddProduct.Handler(dbContext);
 
             // act
             var sut = await handler.Handle(query, CancellationToken.None);
