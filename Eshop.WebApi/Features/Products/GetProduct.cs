@@ -33,7 +33,7 @@ namespace Eshop.WebApi.Features.Products
                 var product = await dbContext.ProductsViews
                     .Include(x => x.Category)
                     .FirstOrDefaultAsync(x => x.Id == command.Id, cancellationToken);
-                if (product is null)
+                if (product is null) // toto
                 {
                     throw new NotFoundException($"Product not found - Id: {command.Id}");
                 }
