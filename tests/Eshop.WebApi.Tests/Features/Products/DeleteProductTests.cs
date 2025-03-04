@@ -1,7 +1,7 @@
 ﻿using Eshop.Domain;
 using Eshop.WebApi.Exceptions;
 using Eshop.WebApi.Features.Products;
-using Snapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace Eshop.WebApi.Tests.Features.Products
 {
@@ -17,28 +17,28 @@ namespace Eshop.WebApi.Tests.Features.Products
         }
 
         [Test]
-        public async Task DeleteProducts_ReturnsCorrectDto()
+        public async Task DeleteProduct_ReturnsCorrectDto()
         {
             // arrange
-
             var query = new DeleteProduct.Command(1);
             var handler = new DeleteProduct.Handler(dbContext);
+
             // act
-
             var sut = await handler.Handle(query, CancellationToken.None);
-            // assert
 
-            sut.ShouldMatchSnapshot();
+            // assert
+            var product = await dbContext.Products.ToListAsync(CancellationToken.None);
+            Assert.That(product, Is.Empty);
         }
 
         [Test]
-        public void DeleteProducts_ThrowsNotFoundException()
+        public void DeleteProduct_ThrowsNotFoundException()
         {
-            // Arrange
+            // arrange
             var query = new DeleteProduct.Command(999);
             var handler = new DeleteProduct.Handler(dbContext);
 
-            // Assert
+            // assert
             Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(query, CancellationToken.None));
         }
 

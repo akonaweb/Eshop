@@ -19,6 +19,7 @@ namespace Eshop.WebApi.Features.Products
                 RuleFor(x => x.Request.Title).NotEmpty();
                 RuleFor(x => x.Request.Description).NotEmpty();
                 RuleFor(x => x.Request.Price).GreaterThan(0);
+                RuleFor(x => x.Request.CategoryId).GreaterThan(0);
             }
         }
 
@@ -49,6 +50,7 @@ namespace Eshop.WebApi.Features.Products
             }
         }
     }
+
     public class UpdateProductRequestDto
     {
         public required string Title { get; set; }
