@@ -1,0 +1,10 @@
+{
+  "Id": 1,
+  "Title": "Test product",
+  "Description": "bla",
+  "Price": 1.0,
+  "Category": {
+    "Id": 1,
+    "Name": "Category 1"
+  }
+}
