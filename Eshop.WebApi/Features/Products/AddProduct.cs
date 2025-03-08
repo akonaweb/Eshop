@@ -1,5 +1,6 @@
 ﻿using Eshop.Domain;
 using Eshop.Persistence;
+using Eshop.WebApi.Exceptions;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,8 @@ namespace Eshop.WebApi.Features.Products
             {
                 RuleFor(x => x.Request.Title).NotEmpty();
                 RuleFor(x => x.Request.Description).NotEmpty();
-                RuleFor(x => x.Request.Price).GreaterThan(0);
+                RuleFor(x => x.Request.Price).GreaterThanOrEqualTo(0);
+                RuleFor(x => x.Request.CategoryId).Must(x => x is null || x > 0);
             }
         }
 
@@ -33,7 +35,16 @@ namespace Eshop.WebApi.Features.Products
             public async Task<AddProductResponseDto> Handle(Command command, CancellationToken cancellationToken)
             {
                 var request = command.Request;
-                var category = await dbContext.Categories.FirstOrDefaultAsync(x => x.Id == request.CategoryId, cancellationToken);
+                Category? category = null;
+                if (request.CategoryId is not null)
+                {
+                    category = await dbContext.Categories.FirstOrDefaultAsync(x => x.Id == request.CategoryId, cancellationToken);
+                    if (category is null)
+                    {
+                        throw new NotFoundException($"Category not found - Id: {request.CategoryId}");
+                    }
+                }
+
                 var product = new Product(0, request.Title, request.Description, request.Price, category);
 
                 var result = await dbContext.Products.AddAsync(product, cancellationToken);
