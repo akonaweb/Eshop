@@ -22,7 +22,7 @@ namespace Eshop.WebApi.Tests.Features.Products.ValidatorTests
         }
 
         [Test]
-        public void GetProductValidatorIs_Valid()
+        public void GetProductValidator_IsValid()
         {
             var command = new GetProduct.Query(1);
             var result = validator.TestValidate(command);

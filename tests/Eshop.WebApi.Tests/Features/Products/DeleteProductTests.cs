@@ -7,18 +7,14 @@ namespace Eshop.WebApi.Tests.Features.Products
 {
     public class DeleteProductTests : TestBase
     {
-        [SetUp]
-        public async Task Seed()
-        {
-            var category = await dbContext.Categories.AddAsync(new Category(0, "Category 1"));
-            await dbContext.Products.AddAsync(new Product(0, "Title", "Description", 1, category.Entity));
-            await dbContext.SaveChangesAsync(CancellationToken.None);
-        }
-
         [Test]
         public async Task DeleteProduct_RemovesProductFromDb()
         {
             // arrange
+            var category = await dbContext.Categories.AddAsync(new Category(0, "Category 1"));
+            await dbContext.Products.AddAsync(new Product(0, "Title", "Description", 1, category.Entity));
+            await dbContext.SaveChangesAsync(CancellationToken.None);
+
             var query = new DeleteProduct.Command(1);
             var handler = new DeleteProduct.Handler(dbContext);
 
@@ -31,13 +27,13 @@ namespace Eshop.WebApi.Tests.Features.Products
         }
 
         [Test]
-        public void DeleteProduct_ThrowsNotFoundException()
+        public void DeleteProduct_WithInvalidProductId_ThrowsNotFoundException()
         {
             // arrange
-            var query = new DeleteProduct.Command(2);
+            var query = new DeleteProduct.Command(1);
             var handler = new DeleteProduct.Handler(dbContext);
 
-            // assert
+            // act/assert
             Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(query, CancellationToken.None));
         }
     }

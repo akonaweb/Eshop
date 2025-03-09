@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MediatR;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Eshop.WebApi.Features.Categories
 {
+    [ExcludeFromCodeCoverage]
     [ApiController]
     [Route("[controller]")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]

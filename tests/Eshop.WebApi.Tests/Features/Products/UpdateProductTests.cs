@@ -7,41 +7,21 @@ namespace Eshop.WebApi.Tests.Features.Products
 {
     public class UpdateProductTests : TestBase
     {
-        [SetUp]
-        public async Task Seed()
-        {
-            var category = await dbContext.Categories.AddAsync(new Category(0, "Category 1"));
-            await dbContext.Products.AddAsync(new Product(0, "Title", "Description", 1, null));
-            await dbContext.SaveChangesAsync(CancellationToken.None);
-        }
-
-        [Test]
-        public void UpdateProduct_ThrowsArgumentNotFoundException()
-        {
-            // act
-            var requestDto = new UpdateProductRequestDto
-            {
-                Title = "Title",
-                Description = "Descritpion",
-                Price = 1,
-            };
-            var query = new UpdateProduct.Command(0, requestDto);
-            var handler = new UpdateProduct.Handler(dbContext);
-
-            // assert
-            Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(query, CancellationToken.None));
-        }
-
         [Test]
         public async Task UpdateProduct_ChangeProperties()
         {
-            // act
+            // arrange
+            var category = await dbContext.Categories.AddAsync(new Category(0, "Category 1"));
+            var category2 = await dbContext.Categories.AddAsync(new Category(0, "Category 2"));
+            await dbContext.Products.AddAsync(new Product(0, "Title", "Description", 1, category.Entity));
+            await dbContext.SaveChangesAsync(CancellationToken.None);
+
             var requestDto = new UpdateProductRequestDto
             {
                 Title = "Title 2",
                 Description = "Descritpion 2",
                 Price = 2,
-                CategoryId = 1
+                CategoryId = 2
             };
             var query = new UpdateProduct.Command(1, requestDto);
             var handler = new UpdateProduct.Handler(dbContext);
@@ -51,6 +31,46 @@ namespace Eshop.WebApi.Tests.Features.Products
 
             // assert
             sut.ShouldMatchSnapshot();
+        }
+
+        [Test]
+        public void UpdateProduct_WithInvalidProductId_ThrowsNotFoundException()
+        {
+            // arrange
+            var requestDto = new UpdateProductRequestDto
+            {
+                Title = "Title",
+                Description = "Descritpion",
+                Price = 1,
+            };
+            var query = new UpdateProduct.Command(1, requestDto);
+            var handler = new UpdateProduct.Handler(dbContext);
+
+            // act/assert
+            Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(query, CancellationToken.None));
+        }
+
+        [Test]
+        public async Task UpdateProduct_WithInvalidCategoryId_ThrowsNotFoundException()
+        {
+            // arrange
+            var category = await dbContext.Categories.AddAsync(new Category(0, "Category 1"));
+            await dbContext.Products.AddAsync(new Product(0, "Title", "Description", 1, category.Entity));
+            await dbContext.SaveChangesAsync(CancellationToken.None);
+
+            var requestDto = new UpdateProductRequestDto
+            {
+                Title = "Updated Title",
+                Description = "Updated Description",
+                Price = 2,
+                CategoryId = 2
+            };
+
+            var query = new UpdateProduct.Command(1, requestDto);
+            var handler = new UpdateProduct.Handler(dbContext);
+
+            // act/assert
+            Assert.ThrowsAsync<NotFoundException>(async () => await handler.Handle(query, CancellationToken.None));
         }
     }
 }
