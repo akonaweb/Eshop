@@ -6,13 +6,6 @@ namespace Eshop.WebApi.Tests.Features.Categories
 {
     public class GetCategoriesTets : TestBase
     {
-        [SetUp]
-        public async Task Seed()
-        {
-            var category = await dbContext.Categories.AddAsync(new Category(0, "Category 1"));
-            await dbContext.SaveChangesAsync(CancellationToken.None);
-        }
-
         [Test]
         public async Task GetCategories_ReturnsCorrectDto()
         {

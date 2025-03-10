@@ -7,13 +7,6 @@ namespace Eshop.WebApi.Tests.Features.Categories
 {
     public class DeleteCategoryTests : TestBase
     {
-        [SetUp]
-        public async Task Seed()
-        {
-            var category = await dbContext.Categories.AddAsync(new Category(0, "Category 1"));
-            await dbContext.SaveChangesAsync(CancellationToken.None);
-        }
-
         [Test]
         public async Task DeleteCategory_ReturnsCorrectDto()
         {
