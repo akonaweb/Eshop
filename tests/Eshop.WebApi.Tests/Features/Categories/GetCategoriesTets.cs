@@ -10,6 +10,10 @@ namespace Eshop.WebApi.Tests.Features.Categories
         public async Task GetCategories_ReturnsCorrectDto()
         {
             // arrange
+            var category = new Category(0, "Category 1");
+            await dbContext.Categories.AddAsync(category);
+            await dbContext.SaveChangesAsync();
+
             var query = new GetCategories.Query();
             var handler = new GetCategories.Handler(dbContext);
 
@@ -19,5 +23,6 @@ namespace Eshop.WebApi.Tests.Features.Categories
             // assert
             sut.ShouldMatchSnapshot();
         }
+
     }
 }

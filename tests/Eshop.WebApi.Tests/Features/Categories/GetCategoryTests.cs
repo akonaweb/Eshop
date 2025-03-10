@@ -11,6 +11,10 @@ namespace Eshop.WebApi.Tests.Features.Categories
         public async Task GetCategory_ReturnsCorrectDto()
         {
             // arrange
+            var category = new Category(0, "Category 1");
+            await dbContext.Categories.AddAsync(category);
+            await dbContext.SaveChangesAsync();
+
             var query = new GetCategory.Query(1);
             var handler = new GetCategory.Handler(dbContext);
 
