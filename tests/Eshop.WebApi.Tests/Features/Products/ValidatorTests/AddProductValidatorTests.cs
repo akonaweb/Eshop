@@ -34,7 +34,7 @@ namespace Eshop.WebApi.Tests.Features.Products.ValidatorTests
         }
 
         [Test]
-        public void AddProductValidator_PriceMustBePositive()
+        public void AddProductValidator_PriceShouldNotBeNegative()
         {
             var requestDto = new AddProductRequestDto { Title = "Title", Description = "Description", Price = -1 };
             var command = new AddProduct.Command(requestDto);

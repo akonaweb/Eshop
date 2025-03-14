@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using FluentValidation;
 using Eshop.WebApi.Exceptions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Eshop.WebApi.Filters
 {
+    [ExcludeFromCodeCoverage]
     public class GlobalExceptionFilter : IExceptionFilter, IFilterMetadata
     {
         private readonly ILogger<GlobalExceptionFilter> logger;

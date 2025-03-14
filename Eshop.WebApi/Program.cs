@@ -3,6 +3,7 @@ using Eshop.WebApi.Filters;
 using MediatR.Extensions.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
 var assembly = typeof(Program).Assembly;
 var builder = WebApplication.CreateBuilder(args);
@@ -77,3 +78,6 @@ void SetupControllers(MvcOptions options)
 {
     options.Filters.Add<GlobalExceptionFilter>();
 }
+
+[ExcludeFromCodeCoverage]
+public partial class Program { }

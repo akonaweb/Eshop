@@ -14,7 +14,7 @@ namespace Eshop.WebApi.Tests.Features.Products.ValidatorTests
         }
 
         [Test]
-        public void UpdateProductValidator_IdMustBePositive()
+        public void UpdateProductValidator_IdMustBeGreatherThanZero()
         {
             var command = new UpdateProduct.Command(0, new UpdateProductRequestDto { Title = "Title", Description = "Description" });
             var result = validator.TestValidate(command);
@@ -40,7 +40,7 @@ namespace Eshop.WebApi.Tests.Features.Products.ValidatorTests
         }
 
         [Test]
-        public void UpdateProductValidator_PriceMustBePositive()
+        public void UpdateProductValidator_PriceShouldNotBeNegative()
         {
             var requestDto = new UpdateProductRequestDto { Title = "Title", Description = "Description", Price = -1 };
             var command = new UpdateProduct.Command(1, requestDto);
