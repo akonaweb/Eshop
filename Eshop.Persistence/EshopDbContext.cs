@@ -1,5 +1,7 @@
 ﻿using Eshop.Domain;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
+using System.Text.Json;
 
 namespace Eshop.Persistence
 {
@@ -23,7 +25,21 @@ namespace Eshop.Persistence
             builder.ApplyConfiguration(new CategoryConfiguration());
             builder.ApplyConfiguration(new ProductConfiguration());
             builder.ApplyConfiguration(new OrderConfiguration());
-            builder.ApplyConfiguration(new OrderItemConfiguration());
+
+           builder.Entity<OrderItem>()
+                .HasKey(oi => new { oi.OrderId, oi.ProductId });
+           builder.Entity<Order>()
+            .HasMany(o => o.OrderItems)
+            .WithOne()
+            .HasForeignKey(oi => oi.OrderId);
+
+           builder.Entity<OrderItem>()
+                .HasOne(oi => oi.Product)
+                .WithMany()
+                .HasForeignKey(oi => oi.ProductId);
+
+            base.OnModelCreating(builder);
+
         }
     }
 }
