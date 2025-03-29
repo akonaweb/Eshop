@@ -18,7 +18,7 @@ namespace Eshop.WebApi.Features.Products
                 this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             }
 
-            public async Task<IEnumerable<GetProductsResponseDto>> Handle(Query command, CancellationToken cancellationToken)
+            public async Task<IEnumerable<GetProductsResponseDto>> Handle(Query query, CancellationToken cancellationToken)
             {
                 var products = await dbContext.ProductsViews
                     .Include(x => x.Category)

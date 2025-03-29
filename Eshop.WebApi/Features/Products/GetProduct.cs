@@ -28,14 +28,14 @@ namespace Eshop.WebApi.Features.Products
                 this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             }
 
-            public async Task<GetProductResponseDto> Handle(Query command, CancellationToken cancellationToken)
+            public async Task<GetProductResponseDto> Handle(Query query, CancellationToken cancellationToken)
             {
                 var product = await dbContext.ProductsViews
                     .Include(x => x.Category)
-                    .FirstOrDefaultAsync(x => x.Id == command.Id, cancellationToken);
+                    .FirstOrDefaultAsync(x => x.Id == query.Id, cancellationToken);
                 if (product is null)
                 {
-                    throw new NotFoundException($"Product not found - Id: {command.Id}");
+                    throw new NotFoundException($"Product not found - Id: {query.Id}");
                 }
 
                 return GetProductResponseDto.Map(product);

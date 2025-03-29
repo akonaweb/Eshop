@@ -28,13 +28,13 @@ namespace Eshop.WebApi.Features.Categories
                 this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             }
 
-            public async Task<GetCategoryResponseDto> Handle(Query command, CancellationToken cancellationToken)
+            public async Task<GetCategoryResponseDto> Handle(Query query, CancellationToken cancellationToken)
             {
                 var category = await dbContext.CategoriesViews
-                    .FirstOrDefaultAsync(x => x.Id == command.Id, cancellationToken);
+                    .FirstOrDefaultAsync(x => x.Id == query.Id, cancellationToken);
                 if (category is null)
                 {
-                    throw new NotFoundException($"Category not found - ID: {command.Id}");
+                    throw new NotFoundException($"Category not found - ID: {query.Id}");
                 }
 
                 return GetCategoryResponseDto.Map(category);
