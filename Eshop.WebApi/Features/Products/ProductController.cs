@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.CodeAnalysis;
 
@@ -35,29 +36,40 @@ namespace Eshop.WebApi.Features.Products
             return Ok(result);
         }
 
+        //[Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize(Roles = "Administrator")]
         [HttpPost(Name = nameof(AddProduct))]
         [ProducesResponseType(typeof(AddProductResponseDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<AddProductResponseDto>> AddProduct(AddProductRequestDto request)
         {
             var result = await mediator.Send(new AddProduct.Command(request));
             return CreatedAtAction(nameof(GetProduct), new { id = result.Id }, result);
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpPut("{id}", Name = nameof(UpdateProduct))]
         [ProducesResponseType(typeof(UpdateProductResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<UpdateProductResponseDto>> UpdateProduct(int id, UpdateProductRequestDto request)
         {
             var result = await mediator.Send(new UpdateProduct.Command(id, request));
             return Ok(result);
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpDelete("{id}", Name = nameof(DeleteProduct))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         public async Task<ActionResult> DeleteProduct(int id)
         {
             await mediator.Send(new DeleteProduct.Command(id));
