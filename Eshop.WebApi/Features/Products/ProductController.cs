@@ -1,6 +1,8 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Claims;
 
 namespace Eshop.WebApi.Features.Products
 {
@@ -17,6 +19,8 @@ namespace Eshop.WebApi.Features.Products
             this.mediator = mediator;
         }
 
+        //[Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Roles = "Administrator")]
         [HttpGet(Name = nameof(GetProducts))]
         [ProducesResponseType(typeof(IEnumerable<GetProductsResponseDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<GetProductsResponseDto>>> GetProducts()

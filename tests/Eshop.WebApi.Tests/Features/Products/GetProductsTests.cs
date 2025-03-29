@@ -1,5 +1,7 @@
 ﻿using Eshop.Domain;
 using Eshop.WebApi.Features.Products;
+using Eshop.WebApi.Infrastructure;
+using Moq;
 using Snapper;
 
 namespace Eshop.WebApi.Tests.Features.Products
@@ -14,8 +16,10 @@ namespace Eshop.WebApi.Tests.Features.Products
             await dbContext.Products.AddAsync(new Product(0, "Title", "Description", 1, category.Entity));
             await dbContext.SaveChangesAsync(CancellationToken.None);
 
+            var userContextMock = new Mock<IUserContext>();
+            userContextMock.Setup(x => x.GetUserId()).Returns(Guid.NewGuid);
             var query = new GetProducts.Query();
-            var handler = new GetProducts.Handler(dbContext);
+            var handler = new GetProducts.Handler(dbContext, userContextMock.Object);
 
             // act
             var sut = await handler.Handle(query, CancellationToken.None);
