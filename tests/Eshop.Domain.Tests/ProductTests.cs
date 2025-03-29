@@ -47,7 +47,6 @@ namespace Eshop.Domain.Tests
         [TestCase("Title", "Description", -1)]
         public void Product_WithInvalidParams_ThrowsException(string? title, string? description, decimal price)
         {
-            var t = StringUtils.GenerateRandomString(501);
             // act/assert
             Assert.Throws<ArgumentNullException>(() => new Product(0, title!, description!, price, null));
         }
