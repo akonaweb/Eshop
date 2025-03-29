@@ -1,5 +1,6 @@
 ﻿using Eshop.Domain;
 using Eshop.Persistence;
+using Eshop.WebApi.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,14 +13,17 @@ namespace Eshop.WebApi.Features.Products
         public class Handler : IRequestHandler<Query, IEnumerable<GetProductsResponseDto>>
         {
             private readonly EshopDbContext dbContext;
+            private readonly IUserContext userContext;
 
-            public Handler(EshopDbContext dbContext)
+            public Handler(EshopDbContext dbContext, IUserContext userContext)
             {
                 this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+                this.userContext = userContext;
             }
 
             public async Task<IEnumerable<GetProductsResponseDto>> Handle(Query command, CancellationToken cancellationToken)
             {
+                var userId = userContext.GetUserId();
                 var products = await dbContext.ProductsViews
                     .Include(x => x.Category)
                     .ToListAsync(cancellationToken);
