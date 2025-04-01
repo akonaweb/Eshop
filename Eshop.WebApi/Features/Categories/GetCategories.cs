@@ -18,7 +18,7 @@ namespace Eshop.WebApi.Features.Categories
                 this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             }
 
-            public async Task<IEnumerable<GetCategoriesResponseDto>> Handle(Query command, CancellationToken cancellationToken)
+            public async Task<IEnumerable<GetCategoriesResponseDto>> Handle(Query query, CancellationToken cancellationToken)
             {
                 var categories = await dbContext.CategoriesViews
                     .ToListAsync(cancellationToken);

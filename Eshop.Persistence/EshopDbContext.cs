@@ -13,11 +13,14 @@ namespace Eshop.Persistence
         public IQueryable<Category> CategoriesViews => Categories.AsNoTracking();
         public DbSet<Product> Products { get; private set; }
         public IQueryable<Product> ProductsViews => Products.AsNoTracking();
+        public DbSet<Order> Orders { get; private set; }
+        public IQueryable<Order> OrdersViews => Orders.AsNoTracking();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfiguration(new CategoryConfiguration());
             builder.ApplyConfiguration(new ProductConfiguration());
+            builder.ApplyConfiguration(new OrderConfiguration());
         }
     }
 }
