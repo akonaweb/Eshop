@@ -15,6 +15,8 @@ namespace Eshop.Domain.Tests
             var address = StringUtils.GenerateRandomString(500);
 
             var sut = new Order(id, customer, address);
+            sut.AddItem(OrderItemMocks.GetOrderItem1());
+            sut.AddItem(OrderItemMocks.GetOrderItem2());
 
             Assert.Multiple(() =>
             {
@@ -22,8 +24,9 @@ namespace Eshop.Domain.Tests
                 Assert.That(sut.Id, Is.EqualTo(id));
                 Assert.That(sut.Customer, Is.EqualTo(customer));
                 Assert.That(sut.Address, Is.EqualTo(address));
-                Assert.That(sut.Items, Has.Count.EqualTo(0));
-                // NOTE: we have no option to properly test CreatedAt
+                Assert.That(sut.Items, Has.Count.EqualTo(2));
+                Assert.That(sut.TotalPrice, Is.EqualTo(10.35m));
+                // NOTE: we have no option to properly test CreatedAt until we inject DateTimeProvider
             });
         }
 

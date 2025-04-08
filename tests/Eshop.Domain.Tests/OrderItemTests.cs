@@ -21,6 +21,7 @@ namespace Eshop.Domain.Tests
                 Assert.That(sut.Quantity, Is.EqualTo(quantity));
                 Assert.That(sut.Price, Is.EqualTo(price));
                 Assert.That(sut.Product, Is.EqualTo(product));
+                Assert.That(sut.TotalPrice, Is.EqualTo(2.46m));
             });
         }
 
