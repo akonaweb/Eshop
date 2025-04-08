@@ -38,5 +38,23 @@ namespace Eshop.Domain.Tests
             // act/assert
             Assert.Throws(exceptionType, () => new OrderItem(quantity, price, product!));
         }
+
+        [Test]
+        public void OrderItem_WithValidParams_CalculatesTotalPriceCorrectly()
+        {
+            // arrange
+            var quantity = 2;
+            var price = 1.23m;
+            var product = ProductMocks.GetProduct1();
+
+            var sut = new OrderItem(quantity, price, product);
+
+            // act
+            var totalPrice = sut.TotalPrice;
+
+            // assert
+            Assert.That(totalPrice, Is.EqualTo(quantity * price));
+        }
+
     }
 }
