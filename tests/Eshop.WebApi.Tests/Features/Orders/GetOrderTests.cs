@@ -1,8 +1,10 @@
 ﻿using Eshop.WebApi.Exceptions;
 using Eshop.WebApi.Features.Orders;
+using Eshop.Domain;
 using Snapper;
+using Microsoft.EntityFrameworkCore;
 
-namespace Eshop.WebApi.Tests.Features.Order
+namespace Eshop.WebApi.Tests.Features.Orders
 {
     public class GetOrderTests : TestBase
     {
@@ -10,9 +12,9 @@ namespace Eshop.WebApi.Tests.Features.Order
         public async Task GetOrder_ReturnsCorrectDto()
         {
             // arrange
-            var order = new Domain.Order(0, "Customer", "Address");
-            order.AddItem(new Domain.OrderItem(1, 1, new Domain.Product(0, "Product 1", "Description", 1, null)));
-            await dbContext.Orders.AddAsync(order);
+            var order = new Order(0, "Customer", "Address");
+            order.AddItem(new OrderItem(1, 1, new Product(0, "Product 1", "Description", 1, null)));
+            await dbContext.Orders.AnyAsync(CancellationToken.None);
             await dbContext.SaveChangesAsync(CancellationToken.None);
             var query = new GetOrder.Query(order.Id);
             var handler = new GetOrder.Handler(dbContext);
@@ -28,7 +30,7 @@ namespace Eshop.WebApi.Tests.Features.Order
         public void GetOrder_WithInvalidId_ThrowsNotFoundException()
         {
             // arrange
-            var query = new GetOrder.Query(0);
+            var query = new GetOrder.Query(1);
             var handler = new GetOrder.Handler(dbContext);
 
             // act/assert

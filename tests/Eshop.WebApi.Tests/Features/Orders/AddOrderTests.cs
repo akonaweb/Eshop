@@ -4,7 +4,7 @@ using Eshop.WebApi.Features.Orders;
 using Snapper;
 using static Eshop.WebApi.Features.Orders.AddOrderRequestDto;
 
-namespace Eshop.WebApi.Tests.Features.Order
+namespace Eshop.WebApi.Tests.Features.Orders
 {
     public class AddOrderTests : TestBase
     {
