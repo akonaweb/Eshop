@@ -9,26 +9,48 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
+using System.Security.Claims;
 
-var assembly = typeof(Program).Assembly;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(SetupControllers);
+SetupSwagger(builder);
+SetupEntityFramework(builder);
+SetupMediatrAndFluentValidation(builder);
+var devCorsPolicy = SetupDevCors(builder);
+SetupAuthenticationAndAuthorization(builder);
+builder.Services.AddHttpContextAccessor();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+var app = builder.Build();
+CreateDbIfNotExists(app);
+await SetupDevEnvironment(devCorsPolicy, app);
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
+
+static void SetupControllers(MvcOptions options)
 {
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        In = ParameterLocation.Header,
-        Description = "Please enter your Bearer token",
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey
-    });
+    options.Filters.Add<GlobalExceptionFilter>();
+}
 
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+static void SetupSwagger(WebApplicationBuilder builder)
+{
+    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+    builder.Services.AddEndpointsApiExplorer();
+
+    builder.Services.AddSwaggerGen(c =>
+    {
+        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            In = ParameterLocation.Header,
+            Description = "Please enter your Bearer token",
+            Name = "Authorization",
+            Type = SecuritySchemeType.ApiKey
+        });
+
+        c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
@@ -42,73 +64,82 @@ builder.Services.AddSwaggerGen(c =>
             Array.Empty<string>()
         }
     });
-});
-
-// EF Configuration
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<EshopDbContext>(
-    options => options.UseSqlServer(connectionString)
-                      .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)
-                      .EnableSensitiveDataLogging(true)
-);
-
-// ASP.NET Core Identity
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(cfg =>
-{
-    cfg.User.RequireUniqueEmail = true;
-})
-.AddEntityFrameworkStores<EshopDbContext>()
-.AddDefaultTokenProviders();
-
-// MediatR - the only nuget package needed is MediatR.Extensions.FluentValidation.AspNetCore - rest are included automatically
-builder.Services.AddFluentValidation([assembly]);
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(assembly));
-
-// Cors Configuration
-var devCorsPolicy = "devCorsPolicy";
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(devCorsPolicy, builder =>
-    {
-        builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
     });
-});
+}
 
-// Authentication/Authorization
-var secretKey = builder.Configuration["JwtSettings:SecretKey"];
-if (string.IsNullOrEmpty(secretKey))
-    throw new ArgumentNullException(nameof(secretKey));
-var keyBytes = Encoding.UTF8.GetBytes(secretKey);
-if (keyBytes.Length < 32)  // Check more then bits/bytes 256/32
-    throw new ArgumentException("The key size must be 256 bits (32 bytes) or greater.");
-builder.Services.AddAuthentication(cfg =>
+static void SetupEntityFramework(WebApplicationBuilder builder)
 {
-    cfg.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
+    // EF Configuration
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    builder.Services.AddDbContext<EshopDbContext>(
+        options => options.UseSqlServer(connectionString)
+                          .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)
+                          .EnableSensitiveDataLogging(true)
+    );
+}
+
+static void SetupMediatrAndFluentValidation(WebApplicationBuilder builder)
 {
-    options.TokenValidationParameters = new TokenValidationParameters
+    // MediatR - the only nuget package needed is MediatR.Extensions.FluentValidation.AspNetCore - rest are included automatically
+    var assembly = typeof(Program).Assembly;
+    builder.Services.AddFluentValidation([assembly]);
+    builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(assembly));
+}
+
+static string SetupDevCors(WebApplicationBuilder builder)
+{
+    var devCorsPolicy = "devCorsPolicy";
+    builder.Services.AddCors(options =>
     {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = true
-    };
-});
-builder.Services.AddAuthorization(options =>
+        options.AddPolicy(devCorsPolicy, builder =>
+        {
+            builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+        });
+    });
+    return devCorsPolicy;
+}
+
+static void SetupAuthenticationAndAuthorization(WebApplicationBuilder builder)
 {
-    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Administrator"));
-});
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IUserContext, UserContext>();
+    builder.Services.AddIdentity<ApplicationUser, IdentityRole>(cfg =>
+    {
+        cfg.User.RequireUniqueEmail = true;
 
-// App build
-var app = builder.Build();
+        cfg.Password.RequireDigit = true;
+        cfg.Password.RequiredLength = 6;
+        cfg.Password.RequireNonAlphanumeric = true;
+        cfg.Password.RequireUppercase = true;
+        cfg.Password.RequireLowercase = true;
+    })
+    .AddEntityFrameworkStores<EshopDbContext>()
+    .AddDefaultTokenProviders();
 
-// EF
-CreateDbIfNotExists(app);
+    var authConfiguration = new AuthConfiguration(builder.Configuration);
+    builder.Services.AddAuthentication(cfg =>
+    {
+        cfg.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    }).AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = authConfiguration.SigningKey,
+            ValidateIssuer = true,
+            ValidIssuer = authConfiguration.Issuer,
+            ValidateAudience = true,
+            ValidAudience = authConfiguration.Audience,
+            ValidateLifetime = true,
+            RoleClaimType = ClaimTypes.Role
+        };
+    });
+    builder.Services.AddAuthorization(options =>
+    {
+        options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Administrator"));
+    });
+
+    builder.Services.AddScoped<IUserContext, UserContext>();
+}
 
 static void CreateDbIfNotExists(IHost host)
 {
@@ -127,28 +158,17 @@ static void CreateDbIfNotExists(IHost host)
     }
 }
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+static async Task SetupDevEnvironment(string devCorsPolicy, WebApplication app)
 {
-    await UserSeeder.SeedData(app);
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        await UserSeeder.SeedData(app);
 
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.UseCors(devCorsPolicy);
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
-
-void SetupControllers(MvcOptions options)
-{
-    options.Filters.Add<GlobalExceptionFilter>();
+        app.UseSwagger();
+        app.UseSwaggerUI();
+        app.UseCors(devCorsPolicy);
+    }
 }
 
 [ExcludeFromCodeCoverage]
