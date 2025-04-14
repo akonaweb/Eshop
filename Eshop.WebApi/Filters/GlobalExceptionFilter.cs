@@ -69,6 +69,38 @@ namespace Eshop.WebApi.Filters
 
                 logger.LogError(context.Exception, "Validation exception occurred.");
             }
+            else if (context.Exception is UnauthorizedException unauthorizedException)
+            {
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "Unauthorized",
+                    Status = StatusCodes.Status401Unauthorized,
+                    Detail = unauthorizedException.Message
+                };
+
+                context.Result = new ObjectResult(problemDetails)
+                {
+                    StatusCode = StatusCodes.Status401Unauthorized
+                };
+
+                logger.LogWarning(context.Exception, "Unauthorized access.");
+            }
+            else if (context.Exception is ForbiddenException forbiddenException)
+            {
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "Forbidden",
+                    Status = StatusCodes.Status403Forbidden,
+                    Detail = forbiddenException.Message
+                };
+
+                context.Result = new ObjectResult(problemDetails)
+                {
+                    StatusCode = StatusCodes.Status403Forbidden
+                };
+
+                logger.LogWarning(context.Exception, "Forbidden access.");
+            }
             else
             {
                 var problemDetails = new ProblemDetails

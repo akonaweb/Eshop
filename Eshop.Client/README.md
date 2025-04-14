@@ -1,23 +1,23 @@
-
 # Create Toolpad App
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-toolpad-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Setup
 
-Run `npx auth secret` to generate a secret and replace the value in the .env.local file with it.
-
-Add the CLIENT_ID and CLIENT_SECRET from your OAuth provider to the .env.local file.
+Add the `NEXT_PUBLIC_API_URL` and `NODE_TLS_REJECT_UNAUTHORIZED` to the .env.local file:
+NEXT_PUBLIC_API_URL=https://localhost:7203
+NODE_TLS_REJECT_UNAUTHORIZED=0
 
 ## Getting Started
 
-First, run the development server: `npm run dev`
+1. Run command to install node_modules: `yarn install`
+2. Run command to start dev server: `yarn dev`
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
+Open [http://localhost:3000] with your browser to see the result.
+You BE should be also running on port [https://localhost:7203/swagger]
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+1. Run command: `yarn build`
+2. Run command if you want to test local build: `yarn start`
+3. Copy artefacts `.next` folder to destination server or cloud
