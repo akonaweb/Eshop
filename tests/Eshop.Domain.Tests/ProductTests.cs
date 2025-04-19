@@ -1,4 +1,5 @@
-﻿using Eshop.Domain.Tests.Utils;
+﻿using Eshop.Shared.Tests.Mocks;
+using Eshop.Shared.Tests.Utils;
 
 namespace Eshop.Domain.Tests
 {
@@ -12,7 +13,7 @@ namespace Eshop.Domain.Tests
             var title = StringUtils.GenerateRandomString(50);
             var description = StringUtils.GenerateRandomString(500);
             var price = 0; // Zero is allowed
-            var category = new Category(0, "Notebooks");
+            var category = CategoryMocks.GetCategory1();
 
             // act
             var sut = new Product(id, title, description, price, category);
@@ -57,9 +58,9 @@ namespace Eshop.Domain.Tests
             // arrange
             var newTitle = StringUtils.GenerateRandomString(50);
             var newDescription = StringUtils.GenerateRandomString(500);
-            var newPrice = 1;
-            var newCategory = new Category(1, "Mouses");
-            var sut = new Product(0, StringUtils.GenerateRandomString(50), StringUtils.GenerateRandomString(500), 0, new Category(0, "Notebooks"));
+            var newPrice = new decimal(new Random().NextDouble());
+            var newCategory = CategoryMocks.GetCategory2();
+            var sut = ProductMocks.GetProduct1();
 
             // act
             sut.Update(newTitle, newDescription, newPrice, newCategory);
@@ -88,7 +89,7 @@ namespace Eshop.Domain.Tests
         public void ProductUpdate_WithInvalidParams_ThrowsException(string? title, string? description, decimal price)
         {
             // arrange
-            var sut = new Product(0, "Title", "Description", 1200, new Category(0, "Notebooks"));
+            var sut = ProductMocks.GetProduct1();
 
             // act/assert
             Assert.Throws<ArgumentNullException>(() => sut.Update(title!, description!, price, null));

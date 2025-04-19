@@ -1,4 +1,5 @@
 ﻿using Eshop.Domain;
+using Eshop.Shared.Tests.Mocks;
 using Eshop.WebApi.Exceptions;
 using Eshop.WebApi.Features.Products;
 using Microsoft.EntityFrameworkCore;
@@ -11,19 +12,18 @@ namespace Eshop.WebApi.Tests.Features.Products
         public async Task DeleteProduct_RemovesProductFromDb()
         {
             // arrange
-            var category = await dbContext.Categories.AddAsync(new Category(0, "Category 1"));
-            await dbContext.Products.AddAsync(new Product(0, "Title", "Description", 1, category.Entity));
+            var product = await dbContext.Products.AddAsync(ProductMocks.GetProduct1());
             await dbContext.SaveChangesAsync(CancellationToken.None);
 
-            var query = new DeleteProduct.Command(1);
+            var query = new DeleteProduct.Command(product.Entity.Id);
             var handler = new DeleteProduct.Handler(dbContext);
 
             // act
             var sut = await handler.Handle(query, CancellationToken.None);
 
             // assert
-            var product = await dbContext.Products.ToListAsync(CancellationToken.None);
-            Assert.That(product, Is.Empty);
+            var result = await dbContext.Products.ToListAsync(CancellationToken.None);
+            Assert.That(result, Is.Empty);
         }
 
         [Test]

@@ -1,4 +1,4 @@
-﻿using Eshop.Domain;
+﻿using Eshop.Shared.Tests.Mocks;
 using Eshop.WebApi.Exceptions;
 using Eshop.WebApi.Features.Categories;
 using Microsoft.EntityFrameworkCore;
@@ -11,19 +11,18 @@ namespace Eshop.WebApi.Tests.Features.Categories
         public async Task DeleteCategory_RemovesCategoryFromDb()
         {
             // arrange
-            var category = new Category(0, "Category 1");
-            await dbContext.Categories.AddAsync(category);
+            var category = await dbContext.Categories.AddAsync(CategoryMocks.GetCategory1());
             await dbContext.SaveChangesAsync(CancellationToken.None);
 
-            var query = new DeleteCategory.Command(1);
+            var query = new DeleteCategory.Command(category.Entity.Id);
             var handler = new DeleteCategory.Handler(dbContext);
 
             // act
             var sut = await handler.Handle(query, CancellationToken.None);
 
             // assert
-            var categories = await dbContext.Categories.ToListAsync(CancellationToken.None);
-            Assert.That(categories, Is.Empty);
+            var result = await dbContext.Categories.ToListAsync(CancellationToken.None);
+            Assert.That(result, Is.Empty);
         }
 
         [Test]

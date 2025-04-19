@@ -5,9 +5,16 @@
   "Items": [
     {
       "ProductId": 1,
-      "ProductTitle": "Product 1",
-      "Quantity": 1,
-      "Price": 1.0
+      "ProductTitle": "Product Title 1",
+      "Quantity": 2,
+      "Price": 1.23
+    },
+    {
+      "ProductId": 2,
+      "ProductTitle": "Product Title 2",
+      "Quantity": 3,
+      "Price": 2.34
     }
-  ]
+  ],
+  "TotalPrice": 9.48
 }

@@ -1,4 +1,5 @@
 ﻿using Eshop.Domain;
+using Eshop.Shared.Tests.Mocks;
 using Eshop.WebApi.Exceptions;
 using Eshop.WebApi.Features.Categories;
 using Snapper;
@@ -11,12 +12,11 @@ namespace Eshop.WebApi.Tests.Features.Categories
         public async Task UpdateCategory_ChangeProperties()
         {
             // act
-            var category = new Category(0, "Category 1");
-            await dbContext.Categories.AddAsync(category);
+            var category = await dbContext.Categories.AddAsync(CategoryMocks.GetCategory1());
             await dbContext.SaveChangesAsync(CancellationToken.None);
 
             var requestDto = new UpdateCategoryRequestDto { Name = "Category 2" };
-            var command = new UpdateCategory.Command(1, requestDto);
+            var command = new UpdateCategory.Command(category.Entity.Id, requestDto);
             var handler = new UpdateCategory.Handler(dbContext);
 
             /// act

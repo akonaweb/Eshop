@@ -1,13 +1,20 @@
 {
   "Id": 1,
-  "Customer": "Customer",
-  "Address": "Address",
+  "Customer": "Customer 1",
+  "Address": "Address 1",
   "Items": [
     {
       "ProductId": 1,
-      "ProductTitle": "Product 1",
+      "ProductTitle": "Product Title 1",
       "Quantity": 1,
-      "Price": 1.0
+      "Price": 2.34
+    },
+    {
+      "ProductId": 2,
+      "ProductTitle": "Product Title 2",
+      "Quantity": 2,
+      "Price": 5.67
     }
-  ]
+  ],
+  "TotalPrice": 13.68
 }

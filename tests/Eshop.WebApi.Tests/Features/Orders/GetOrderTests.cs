@@ -1,4 +1,4 @@
-﻿using Eshop.Domain;
+﻿using Eshop.Shared.Tests.Mocks;
 using Eshop.WebApi.Exceptions;
 using Eshop.WebApi.Features.Orders;
 using Snapper;
@@ -11,13 +11,14 @@ namespace Eshop.WebApi.Tests.Features.Orders
         public async Task GetOrder_ReturnsCorrectDto()
         {
             // arrange
-            var product = new Product(0, "Product 1", "Description", 1, null);
-            await dbContext.Products.AddAsync(product, CancellationToken.None);
-            var order = new Order(0, "Customer", "Address");
-            var orderItem = new OrderItem(1, 1, product);
-            order.AddItem(orderItem);
+            var orderItem1 = OrderItemMocks.GetOrderItem1();
+            var orderItem2 = OrderItemMocks.GetOrderItem2();
+            var order = OrderMocks.GetOrder1();
+            order.AddItem(orderItem1);
+            order.AddItem(orderItem2);
             await dbContext.Orders.AddAsync(order, CancellationToken.None);
             await dbContext.SaveChangesAsync(CancellationToken.None);
+
             var query = new GetOrder.Query(order.Id);
             var handler = new GetOrder.Handler(dbContext);
 
@@ -27,6 +28,7 @@ namespace Eshop.WebApi.Tests.Features.Orders
             // assert
             sut.ShouldMatchSnapshot();
         }
+
 
         [Test]
         public void GetOrder_WithInvalidId_ThrowsNotFoundException()

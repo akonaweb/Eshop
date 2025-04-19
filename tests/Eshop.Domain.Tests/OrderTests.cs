@@ -1,5 +1,5 @@
-﻿using Eshop.Domain.Tests.Mocks;
-using Eshop.Domain.Tests.Utils;
+﻿using Eshop.Shared.Tests.Mocks;
+using Eshop.Shared.Tests.Utils;
 
 namespace Eshop.Domain.Tests
 {
@@ -24,9 +24,9 @@ namespace Eshop.Domain.Tests
                 Assert.That(sut.Id, Is.EqualTo(id));
                 Assert.That(sut.Customer, Is.EqualTo(customer));
                 Assert.That(sut.Address, Is.EqualTo(address));
-                Assert.That(sut.Items, Has.Count.EqualTo(2));
-                Assert.That(sut.TotalPrice, Is.EqualTo(10.35m));
+                Assert.That(sut.TotalPrice, Is.EqualTo(13.68m));
                 // NOTE: we have no option to properly test CreatedAt until we inject DateTimeProvider
+                Assert.That(sut.Items, Has.Count.EqualTo(2));
             });
         }
 
@@ -49,20 +49,6 @@ namespace Eshop.Domain.Tests
         {
             // act/assert
             Assert.Throws<ArgumentNullException>(() => new Order(0, customer!, address!));
-        }
-
-        [Test]
-        public void Order_AddItem_SetCorrectlyOrderItem()
-        {
-            // arrange
-            var sut = OrderMocks.GetOrder1();
-
-            // act
-            sut.AddItem(OrderItemMocks.GetOrderItem1());
-            sut.AddItem(OrderItemMocks.GetOrderItem2());
-
-            // assert
-            Assert.That(sut.Items, Has.Count.EqualTo(2));
         }
 
         [Test]

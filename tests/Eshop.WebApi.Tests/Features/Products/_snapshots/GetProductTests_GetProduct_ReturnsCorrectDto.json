@@ -1,10 +1,10 @@
 {
   "Id": 1,
-  "Title": "Title",
-  "Description": "Description",
-  "Price": 1.0,
+  "Title": "Product Title 1",
+  "Description": "Product Description 1",
+  "Price": 1.23,
   "Category": {
     "Id": 1,
-    "Name": "Category 1"
+    "Name": "Category Name 1"
   }
 }

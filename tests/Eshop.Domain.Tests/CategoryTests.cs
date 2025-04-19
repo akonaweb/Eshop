@@ -1,4 +1,5 @@
-using Eshop.Domain.Tests.Utils;
+using Eshop.Shared.Tests.Mocks;
+using Eshop.Shared.Tests.Utils;
 
 namespace Eshop.Domain.Tests
 {
@@ -43,7 +44,7 @@ namespace Eshop.Domain.Tests
         {
             // arrange
             var newCategoryName = StringUtils.GenerateRandomString(50);
-            var sut = new Category(0, "Notebook");
+            var sut = CategoryMocks.GetCategory1();
 
             // act
             sut.Udpate(newCategoryName);
@@ -58,7 +59,7 @@ namespace Eshop.Domain.Tests
         public void CategoryUpdate_WithInvalidParams_ThrowsException(string? newCategoryName)
         {
             // arrange
-            var sut = new Category(0, "Notebook");
+            var sut = CategoryMocks.GetCategory1();
 
             // act/assert
             Assert.Throws<ArgumentNullException>(() => sut.Udpate(newCategoryName!));

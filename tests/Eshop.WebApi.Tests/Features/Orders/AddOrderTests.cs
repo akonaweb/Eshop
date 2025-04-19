@@ -1,4 +1,4 @@
-﻿using Eshop.Domain;
+﻿using Eshop.Shared.Tests.Mocks;
 using Eshop.WebApi.Exceptions;
 using Eshop.WebApi.Features.Orders;
 using Snapper;
@@ -12,9 +12,13 @@ namespace Eshop.WebApi.Tests.Features.Orders
         public async Task AddOrder_ReturnsCorrectDto()
         {
             // arrange
-            await dbContext.Products.AddAsync(new Product(0, "Product 1", "Description", 1, null));
+            var product1 = ProductMocks.GetProduct1();
+            var product2 = ProductMocks.GetProduct2();
+
+            await dbContext.Products.AddRangeAsync(product1, product2);
             await dbContext.SaveChangesAsync(CancellationToken.None);
-            var query = new AddOrder.Command(new AddOrderRequestDto
+
+            var command = new AddOrder.Command(new AddOrderRequestDto
             {
                 Customer = "Customer",
                 Address = "Address",
@@ -22,15 +26,21 @@ namespace Eshop.WebApi.Tests.Features.Orders
                 {
                     new AddOrderItemRequestDto
                     {
-                        ProductId = 1,
-                        Quantity = 1
+                        ProductId = product1.Id,
+                        Quantity = 2
+                    },
+                    new AddOrderItemRequestDto
+                    {
+                        ProductId = product2.Id,
+                        Quantity = 3
                     }
                 }
             });
+
             var handler = new AddOrder.Hanlder(dbContext);
 
             // act
-            var sut = await handler.Handle(query, CancellationToken.None);
+            var sut = await handler.Handle(command, CancellationToken.None);
 
             // assert
             sut.ShouldMatchSnapshot();
@@ -45,13 +55,13 @@ namespace Eshop.WebApi.Tests.Features.Orders
                 Customer = "Customer",
                 Address = "Address",
                 Items = new List<AddOrderItemRequestDto>
-                {
-                    new AddOrderItemRequestDto
                     {
-                        ProductId = 0,
-                        Quantity = 1
+                        new AddOrderItemRequestDto
+                        {
+                            ProductId = 0,
+                            Quantity = 1
+                        }
                     }
-                }
             });
             var handler = new AddOrder.Hanlder(dbContext);
 

@@ -2,18 +2,18 @@
   "Items": [
     {
       "ProductId": 1,
-      "ProductTitle": "Product 1",
+      "ProductTitle": "Product Title 1",
       "Quantity": 2,
-      "Price": 10.0,
-      "TotalPrice": 20.0
+      "Price": 1.23,
+      "TotalPrice": 2.46
     },
     {
       "ProductId": 2,
-      "ProductTitle": "Product 2",
+      "ProductTitle": "Product Title 2",
       "Quantity": 3,
-      "Price": 20.0,
-      "TotalPrice": 60.0
+      "Price": 2.34,
+      "TotalPrice": 7.02
     }
   ],
-  "TotalPrice": 80.0
+  "TotalPrice": 9.48
 }
