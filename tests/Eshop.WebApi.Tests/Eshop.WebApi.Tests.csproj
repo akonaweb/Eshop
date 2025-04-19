@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Eshop.Persistence\Eshop.Persistence.csproj" />
     <ProjectReference Include="..\..\Eshop.WebApi\Eshop.WebApi.csproj" />
+    <ProjectReference Include="..\Eshop.Shared.Tests\Eshop.Shared.Tests.csproj" />
   </ItemGroup>
 
   <ItemGroup>
