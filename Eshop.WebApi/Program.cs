@@ -17,12 +17,13 @@ builder.Services.AddControllers(SetupControllers);
 SetupSwagger(builder);
 SetupEntityFramework(builder);
 SetupMediatrAndFluentValidation(builder);
-var devCorsPolicy = SetupDevCors(builder);
+var corsPolicy = "corsPolicy";
+SetupCors(builder, corsPolicy);
 SetupAuthenticationAndAuthorization(builder);
 
 var app = builder.Build();
 CreateDbIfNotExists(app);
-await SetupDevEnvironment(devCorsPolicy, app);
+await SetupEnvironment(app, corsPolicy);
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -71,9 +72,12 @@ static void SetupEntityFramework(WebApplicationBuilder builder)
     // EF Configuration
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     builder.Services.AddDbContext<EshopDbContext>(
-        options => options.UseSqlServer(connectionString)
-                          .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)
-                          .EnableSensitiveDataLogging(true)
+        options => options.UseSqlServer(connectionString, sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+        })
+        .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)
+        .EnableSensitiveDataLogging(true)
     );
 }
 
@@ -85,17 +89,15 @@ static void SetupMediatrAndFluentValidation(WebApplicationBuilder builder)
     builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(assembly));
 }
 
-static string SetupDevCors(WebApplicationBuilder builder)
+static void SetupCors(WebApplicationBuilder builder, string corsPolicy)
 {
-    var devCorsPolicy = "devCorsPolicy";
     builder.Services.AddCors(options =>
     {
-        options.AddPolicy(devCorsPolicy, builder =>
+        options.AddPolicy(corsPolicy, config =>
         {
-            builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+            config.WithOrigins(builder.Configuration["Client:Url"]!).AllowAnyHeader().AllowAnyMethod();
         });
     });
-    return devCorsPolicy;
 }
 
 static void SetupAuthenticationAndAuthorization(WebApplicationBuilder builder)
@@ -158,17 +160,19 @@ static void CreateDbIfNotExists(IHost host)
     }
 }
 
-static async Task SetupDevEnvironment(string devCorsPolicy, WebApplication app)
+static async Task SetupEnvironment(WebApplication app, string corsPolicy)
 {
+    await UserSeeder.SeedData(app);
+
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
     {
-        await UserSeeder.SeedData(app);
 
         app.UseSwagger();
         app.UseSwaggerUI();
-        app.UseCors(devCorsPolicy);
     }
+
+    app.UseCors(corsPolicy);
 }
 
 [ExcludeFromCodeCoverage]

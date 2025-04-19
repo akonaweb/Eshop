@@ -6,6 +6,9 @@
 # Development
 appsettings.Development.json
 
+# Production
+appsettings.Production.json
+
 # User-specific files
 *.rsuser
 *.suo
