@@ -53,5 +53,15 @@ namespace Eshop.WebApi.Features.Orders
             var result = await mediator.Send(new AddOrder.Command(request));
             return CreatedAtAction(nameof(GetOrder), new { id = result.Id }, result);
         }
+
+        [HttpDelete("{id}", Name = nameof(DeleteOrder))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteOrder(int id)
+        {
+            await mediator.Send(new DeleteOrder.Command(id));
+            return NoContent();
+        }
     }
 }
