@@ -1,4 +1,4 @@
-﻿using Eshop.Domain;
+﻿using Eshop.Shared.Tests.Mocks;
 using Eshop.WebApi.Exceptions;
 using Eshop.WebApi.Features.Categories;
 using Snapper;
@@ -11,7 +11,7 @@ namespace Eshop.WebApi.Tests.Features.Categories
         public async Task GetCategory_ReturnsCorrectDto()
         {
             // arrange
-            var category = new Category(0, "Category 1");
+            var category = CategoryMocks.GetCategory1();
             dbContext.Categories.Add(category);
             await dbContext.SaveChangesAsync(CancellationToken.None);
 

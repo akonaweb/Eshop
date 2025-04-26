@@ -4,7 +4,7 @@ namespace Eshop.Shared.Tests.Mocks
 {
     public static class ProductMocks
     {
-        public static Product GetProduct1() => new(1, "Title 1", "Description 1", 1, CategoryMocks.GetCategory1());
-        public static Product GetProduct2() => new(2, "Title 2", "Description 2", 2, CategoryMocks.GetCategory2());
+        public static Product GetProduct1() => new(1, "Product Title 1", "Product Description 1", 1.23m, CategoryMocks.GetCategory1());
+        public static Product GetProduct2() => new(2, "Product Title 2", "Product Description 2", 2.34m, CategoryMocks.GetCategory2());
     }
 }

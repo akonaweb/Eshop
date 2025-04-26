@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Eshop.Persistence
 {
+    [ExcludeFromCodeCoverage]
     public class ApplicationUser : IdentityUser
     {
         public string? RefreshToken { get; private set; }

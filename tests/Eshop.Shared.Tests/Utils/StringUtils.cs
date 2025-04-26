@@ -1,4 +1,4 @@
-﻿namespace Eshop.Domain.Tests.Utils
+﻿namespace Eshop.Shared.Tests.Utils
 {
     public static class StringUtils
     {

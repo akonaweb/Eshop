@@ -1,4 +1,4 @@
-﻿using Eshop.Domain;
+﻿using Eshop.Shared.Tests.Mocks;
 using Eshop.WebApi.Exceptions;
 using Eshop.WebApi.Features.Products;
 using Snapper;
@@ -11,9 +11,8 @@ namespace Eshop.WebApi.Tests.Features.Products
         public async Task UpdateProduct_ChangeProperties()
         {
             // arrange
-            var category = await dbContext.Categories.AddAsync(new Category(0, "Category 1"));
-            var category2 = await dbContext.Categories.AddAsync(new Category(0, "Category 2"));
-            await dbContext.Products.AddAsync(new Product(0, "Title", "Description", 1, category.Entity));
+            var category2 = await dbContext.Categories.AddAsync(CategoryMocks.GetCategory2());
+            var product = await dbContext.Products.AddAsync(ProductMocks.GetProduct1());
             await dbContext.SaveChangesAsync(CancellationToken.None);
 
             var requestDto = new UpdateProductRequestDto
@@ -21,9 +20,9 @@ namespace Eshop.WebApi.Tests.Features.Products
                 Title = "Title 2",
                 Description = "Descritpion 2",
                 Price = 2,
-                CategoryId = 2
+                CategoryId = category2.Entity.Id
             };
-            var query = new UpdateProduct.Command(1, requestDto);
+            var query = new UpdateProduct.Command(product.Entity.Id, requestDto);
             var handler = new UpdateProduct.Handler(dbContext);
 
             /// act
@@ -54,19 +53,18 @@ namespace Eshop.WebApi.Tests.Features.Products
         public async Task UpdateProduct_WithInvalidCategoryId_ThrowsNotFoundException()
         {
             // arrange
-            var category = await dbContext.Categories.AddAsync(new Category(0, "Category 1"));
-            await dbContext.Products.AddAsync(new Product(0, "Title", "Description", 1, category.Entity));
+            var product = await dbContext.Products.AddAsync(ProductMocks.GetProduct1());
             await dbContext.SaveChangesAsync(CancellationToken.None);
 
             var requestDto = new UpdateProductRequestDto
             {
-                Title = "Updated Title",
-                Description = "Updated Description",
-                Price = 2,
+                Title = "Title",
+                Description = "Description",
+                Price = 1,
                 CategoryId = 2
             };
 
-            var query = new UpdateProduct.Command(1, requestDto);
+            var query = new UpdateProduct.Command(product.Entity.Id, requestDto);
             var handler = new UpdateProduct.Handler(dbContext);
 
             // act/assert

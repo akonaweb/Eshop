@@ -1,4 +1,4 @@
-﻿using Eshop.Domain;
+﻿using Eshop.Shared.Tests.Mocks;
 using Eshop.WebApi.Exceptions;
 using Eshop.WebApi.Features.Products;
 using Snapper;
@@ -11,7 +11,7 @@ namespace Eshop.WebApi.Tests.Features.Products
         public async Task AddProduct_ReturnsCorrectDto()
         {
             // arrange
-            await dbContext.Categories.AddAsync(new Category(0, "Category 1"));
+            var category = await dbContext.Categories.AddAsync(CategoryMocks.GetCategory1());
             await dbContext.SaveChangesAsync(CancellationToken.None);
 
             var query = new AddProduct.Command(new AddProductRequestDto
@@ -19,7 +19,7 @@ namespace Eshop.WebApi.Tests.Features.Products
                 Title = "Title",
                 Description = "Description",
                 Price = 1,
-                CategoryId = 1
+                CategoryId = category.Entity.Id
             });
             var handler = new AddProduct.Handler(dbContext);
 

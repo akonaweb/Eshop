@@ -50,6 +50,7 @@ namespace Eshop.WebApi.Features.Orders
         public required string Customer { get; set; }
         public required string Address { get; set; }
         public required IEnumerable<GetOrderItemResponseDto> Items { get; set; }
+        public decimal TotalPrice { get; set; }
 
         public class GetOrderItemResponseDto
         {
@@ -75,7 +76,8 @@ namespace Eshop.WebApi.Features.Orders
                         Quantity = x.Quantity,
                         Price = x.Price
                     };
-                }).ToList()
+                }).ToList(),
+                TotalPrice = result.TotalPrice
             };
         }
     }
