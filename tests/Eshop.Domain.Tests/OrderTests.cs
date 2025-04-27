@@ -14,7 +14,7 @@ namespace Eshop.Domain.Tests
             var customer = StringUtils.GenerateRandomString(50);
             var address = StringUtils.GenerateRandomString(500);
 
-            var sut = new Order(id, customer, address);
+            var sut = new Order(id, customer, address, DateTimeMocks.Now);
             sut.AddItem(OrderItemMocks.GetOrderItem1());
             sut.AddItem(OrderItemMocks.GetOrderItem2());
 
@@ -25,7 +25,7 @@ namespace Eshop.Domain.Tests
                 Assert.That(sut.Customer, Is.EqualTo(customer));
                 Assert.That(sut.Address, Is.EqualTo(address));
                 Assert.That(sut.TotalPrice, Is.EqualTo(13.68m));
-                // NOTE: we have no option to properly test CreatedAt until we inject DateTimeProvider
+                Assert.That(sut.CreatedAt, Is.EqualTo(DateTimeMocks.Now));
                 Assert.That(sut.Items, Has.Count.EqualTo(2));
             });
         }
@@ -34,7 +34,7 @@ namespace Eshop.Domain.Tests
         public void Order_WithInvalidIdParam_ThrowsException()
         {
             // act/assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => new Order(-1, "Customer", "Address"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Order(-1, "Customer", "Address", DateTime.UtcNow));
         }
 
         // Customer property
@@ -48,7 +48,7 @@ namespace Eshop.Domain.Tests
         public void Order_WithInvalidParams_ThrowsException(string? customer, string? address)
         {
             // act/assert
-            Assert.Throws<ArgumentNullException>(() => new Order(0, customer!, address!));
+            Assert.Throws<ArgumentNullException>(() => new Order(0, customer!, address!, DateTime.UtcNow));
         }
 
         [Test]

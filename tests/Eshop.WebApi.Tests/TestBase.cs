@@ -1,5 +1,8 @@
+using Eshop.Infrastructure;
 using Eshop.Persistence;
+using Eshop.Shared.Tests.Mocks;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 
 namespace Eshop.WebApi.Tests
 {
@@ -8,6 +11,8 @@ namespace Eshop.WebApi.Tests
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         protected EshopDbContext dbContext;
         protected DbContextOptions<EshopDbContext> dbContextOptions;
+        protected static DateTime Now => DateTimeMocks.Now;
+        protected Mock<IDateTimeProvider> dateTimeProviderMock;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
         [SetUp]
@@ -21,6 +26,9 @@ namespace Eshop.WebApi.Tests
 
             await dbContext.Database.OpenConnectionAsync();
             await dbContext.Database.EnsureCreatedAsync();
+
+            dateTimeProviderMock = new Mock<IDateTimeProvider>();
+            dateTimeProviderMock.Setup(x => x.Now).Returns(Now);
         }
 
         [TearDown]

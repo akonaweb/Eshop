@@ -1,4 +1,5 @@
-﻿using Eshop.Persistence;
+﻿using Eshop.Infrastructure;
+using Eshop.Persistence;
 using Eshop.WebApi.Filters;
 using Eshop.WebApi.Infrastructure;
 using MediatR.Extensions.FluentValidation.AspNetCore;
@@ -14,6 +15,7 @@ using System.Security.Claims;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(SetupControllers);
+SetupServices(builder.Services);
 SetupSwagger(builder);
 SetupEntityFramework(builder);
 SetupMediatrAndFluentValidation(builder);
@@ -33,6 +35,10 @@ app.Run();
 static void SetupControllers(MvcOptions options)
 {
     options.Filters.Add<GlobalExceptionFilter>();
+}
+static void SetupServices(IServiceCollection services)
+{
+    services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 }
 
 static void SetupSwagger(WebApplicationBuilder builder)
