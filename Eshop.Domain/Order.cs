@@ -11,14 +11,14 @@ namespace Eshop.Domain
         private Order() { } // private ctor needed for a persistence - Entity Framework
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
-        public Order(int id, string customer, string address)
+        public Order(int id, string customer, string address, DateTime createdAt)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(id);
 
             ValidateParameters(customer, address);
 
             Id = id;
-            CreatedAt = DateTime.UtcNow; // Eventually we should use DateTime provider - we will have problem to test this prop
+            CreatedAt = createdAt;
             Customer = customer;
             Address = address;
         }

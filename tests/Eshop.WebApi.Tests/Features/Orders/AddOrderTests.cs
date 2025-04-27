@@ -36,8 +36,7 @@ namespace Eshop.WebApi.Tests.Features.Orders
                     }
                 }
             });
-
-            var handler = new AddOrder.Hanlder(dbContext);
+            var handler = new AddOrder.Hanlder(dbContext, dateTimeProviderMock.Object);
 
             // act
             var sut = await handler.Handle(command, CancellationToken.None);
@@ -63,7 +62,7 @@ namespace Eshop.WebApi.Tests.Features.Orders
                         }
                     }
             });
-            var handler = new AddOrder.Hanlder(dbContext);
+            var handler = new AddOrder.Hanlder(dbContext, dateTimeProviderMock.Object);
 
             // act/assert
             Assert.ThrowsAsync<NotFoundException>(async () => await handler.Handle(query, CancellationToken.None));

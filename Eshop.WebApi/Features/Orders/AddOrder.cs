@@ -1,4 +1,5 @@
 using Eshop.Domain;
+using Eshop.Infrastructure;
 using Eshop.Persistence;
 using Eshop.WebApi.Exceptions;
 using FluentValidation;
@@ -32,16 +33,18 @@ namespace Eshop.WebApi.Features.Orders
         public class Hanlder : IRequestHandler<Command, AddOrderResponseDto>
         {
             private readonly EshopDbContext dbContext;
+            private readonly IDateTimeProvider dateTimeProvider;
 
-            public Hanlder(EshopDbContext dbContext)
+            public Hanlder(EshopDbContext dbContext, IDateTimeProvider dateTimeProvider)
             {
                 this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+                this.dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
             }
 
             public async Task<AddOrderResponseDto> Handle(Command command, CancellationToken cancellationToken)
             {
                 var request = command.Request;
-                var order = new Order(0, request.Customer, request.Address);
+                var order = new Order(0, request.Customer, request.Address, dateTimeProvider.Now);
 
                 foreach (var item in request.Items)
                 {

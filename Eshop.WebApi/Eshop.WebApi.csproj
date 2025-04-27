@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Eshop.Domain\Eshop.Domain.csproj" />
+    <ProjectReference Include="..\Eshop.Infrastructure\Eshop.Infrastructure.csproj" />
     <ProjectReference Include="..\Eshop.Persistence\Eshop.Persistence.csproj" />
   </ItemGroup>
 

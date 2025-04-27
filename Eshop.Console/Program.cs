@@ -26,7 +26,7 @@ Console.WriteLine("---");
 
 // Orders
 Console.WriteLine("ORDERS");
-var order = new Order(1, "Anton", "Street 1");
+var order = new Order(1, "Anton", "Street 1", DateTime.UtcNow);
 order.AddItem(new OrderItem(1, 1.23m, products[0]));
 order.AddItem(new OrderItem(2, 4.56m, products[1]));
 Console.WriteLine($"{order.Id} | {order.Customer} | {order.Address} | {order.CreatedAt}");
