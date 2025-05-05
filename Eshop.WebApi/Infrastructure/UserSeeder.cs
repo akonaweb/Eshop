@@ -16,13 +16,11 @@ namespace Eshop.WebApi.Infrastructure
                 var email = "test@test.com";
                 var defaultUser = await userManager.FindByEmailAsync(email);
 
-                // Vytvorenie role, ak ešte neexistuje
                 if (await roleManager.FindByNameAsync("Administrator") == null)
                 {
                     await roleManager.CreateAsync(new IdentityRole("Administrator"));
                 }
 
-                // Vytvorenie používateľa, ak neexistuje
                 if (defaultUser == null)
                 {
                     defaultUser = new ApplicationUser(email);
@@ -31,7 +29,6 @@ namespace Eshop.WebApi.Infrastructure
 
                     if (result.Succeeded)
                     {
-                        // Priradenie role admin
                         await userManager.AddToRoleAsync(defaultUser, "Administrator");
                     }
                 }
