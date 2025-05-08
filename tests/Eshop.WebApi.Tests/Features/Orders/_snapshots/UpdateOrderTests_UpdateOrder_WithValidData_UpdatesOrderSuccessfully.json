@@ -1,7 +1,7 @@
 {
   "Id": 1,
-  "Customer": "Customer",
-  "Address": "Address",
+  "Customer": "Updated Customer",
+  "Address": "Updated Address",
   "Items": [
     {
       "ProductId": 1,
@@ -11,12 +11,12 @@
       "TotalPrice": 2.46
     },
     {
-      "ProductId": 2,
-      "ProductTitle": "Product Title 2",
+      "ProductId": 3,
+      "ProductTitle": "Product Title 3",
       "Quantity": 3,
-      "Price": 2.34,
-      "TotalPrice": 7.02
+      "Price": 3.45,
+      "TotalPrice": 10.35
     }
   ],
-  "TotalPrice": 9.48
+  "TotalPrice": 12.81
 }

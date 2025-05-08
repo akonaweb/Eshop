@@ -45,23 +45,24 @@ namespace Eshop.WebApi.Features.Categories
             }
         }
     }
-}
-public class UpdateCategoryRequestDto
-{
-    public required string Name { get; set; }
-}
 
-public class UpdateCategoryResponseDto
-{
-    public int Id { get; set; }
-    public required string Name { get; set; }
-
-    internal static UpdateCategoryResponseDto Map(Category result)
+    public class UpdateCategoryRequestDto
     {
-        return new UpdateCategoryResponseDto 
-        { 
-            Id = result.Id, 
-            Name = result.Name 
-        };
+        public required string Name { get; set; }
+    }
+
+    public class UpdateCategoryResponseDto
+    {
+        public int Id { get; set; }
+        public required string Name { get; set; }
+
+        internal static UpdateCategoryResponseDto Map(Category result)
+        {
+            return new UpdateCategoryResponseDto
+            {
+                Id = result.Id,
+                Name = result.Name
+            };
+        }
     }
 }

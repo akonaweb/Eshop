@@ -11,11 +11,7 @@ namespace Eshop.WebApi.Tests.Features.Orders
         public async Task GetOrder_ReturnsCorrectDto()
         {
             // arrange
-            var orderItem1 = OrderItemMocks.GetOrderItem1();
-            var orderItem2 = OrderItemMocks.GetOrderItem2();
             var order = OrderMocks.GetOrder1();
-            order.AddItem(orderItem1);
-            order.AddItem(orderItem2);
             await dbContext.Orders.AddAsync(order, CancellationToken.None);
             await dbContext.SaveChangesAsync(CancellationToken.None);
 
