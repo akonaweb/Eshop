@@ -25,10 +25,17 @@ namespace Eshop.Domain
 
         public int Id { get; }
         public DateTime CreatedAt { get; }
-        public string Customer { get; }
-        public string Address { get; }
+        public string Customer { get; private set; } // Changed to allow modification
+        public string Address { get; private set; } // Changed to allow modification
         public IReadOnlyCollection<OrderItem> Items => items;
         public decimal TotalPrice => Items.Sum(x => x.TotalPrice);
+
+        public void Update(string customer, string address)
+        {
+            ValidateParameters(customer, address);
+            Customer = customer;
+            Address = address;
+        }
 
         public void AddItem(OrderItem item)
         {

@@ -1,5 +1,4 @@
-﻿using Eshop.Domain;
-using Eshop.Shared.Tests.Mocks;
+﻿using Eshop.Shared.Tests.Mocks;
 using Eshop.WebApi.Exceptions;
 using Eshop.WebApi.Features.Categories;
 using Snapper;
