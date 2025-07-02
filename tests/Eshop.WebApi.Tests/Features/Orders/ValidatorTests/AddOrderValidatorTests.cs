@@ -1,6 +1,7 @@
-﻿using FluentValidation.TestHelper;
+﻿using Eshop.WebApi.Features.Orders;
+using FluentValidation.TestHelper;
 
-namespace Eshop.WebApi.Features.Orders
+namespace Eshop.WebApi.Tests.Features.Orders.ValidatorTests
 {
     public class AddOrderValidatorTests
     {

@@ -35,18 +35,12 @@ namespace Eshop.WebApi.Features.Users
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest model)
+        [ProducesResponseType(typeof(RegisterUserResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            var user = new ApplicationUser(model.Email);
-
-            var result = await userManager.CreateAsync(user, model.Password);
-            if (!result.Succeeded)
-                return BadRequest(result.Errors);
-
-            // Here you can also assign automatically some role e.g.: "Customer":
-            // await userManager.AddToRoleAsync(user, "Customer");
-
-            return Ok("User created successfully.");
+            var result = await mediator.Send(new RegisterUser.Command(request));
+            return Ok(result);
         }
 
         [HttpPost("login")]
