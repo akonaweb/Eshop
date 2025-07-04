@@ -3,8 +3,8 @@
 Console.WriteLine("CATEGORIES");
 var categories = new List<Category>
 {
-    new Category(1, "Computers"),
-    new Category(2, "Mouses")
+    new(1, "Computers"),
+    new(2, "Mouses")
 };
 foreach (var category in categories)
 {
@@ -15,8 +15,8 @@ Console.WriteLine("---");
 Console.WriteLine("PRODUCTS");
 var products = new List<Product>
 {
-    new Product(1, "Notebook Acer 15", "Best notebook out there", 399.99m, categories[0]),
-    new Product(2, "Mouse Razor 123", "Best Mouse", 14.50m, categories[1])
+    new(1, "Notebook Acer 15", "Best notebook out there", 399.99m, categories[0]),
+    new(2, "Mouse Razor 123", "Best Mouse", 14.50m, categories[1])
 };
 foreach (var product in products)
 {
@@ -26,9 +26,8 @@ Console.WriteLine("---");
 
 // Orders
 Console.WriteLine("ORDERS");
-var order = new Order(1, "Anton", "Street 1", DateTime.UtcNow);
-order.AddItem(new OrderItem(1, 1.23m, products[0]));
-order.AddItem(new OrderItem(2, 4.56m, products[1]));
+var orderItems = new List<OrderItem> { new(1, 1.23m, products[0]), new(2, 4.56m, products[1]) };
+var order = new Order(1, "Anton", "Street 1", DateTime.UtcNow, orderItems);
 Console.WriteLine($"{order.Id} | {order.Customer} | {order.Address} | {order.CreatedAt}");
 Console.WriteLine("---");
 

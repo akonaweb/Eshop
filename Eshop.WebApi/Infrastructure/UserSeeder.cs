@@ -1,8 +1,10 @@
 ﻿using Eshop.Persistence;
 using Microsoft.AspNetCore.Identity;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Eshop.WebApi.Infrastructure
 {
+    [ExcludeFromCodeCoverage]
     public static class UserSeeder
     {
         public static async Task SeedData(IHost host)

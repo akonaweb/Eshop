@@ -1,5 +1,4 @@
 using Eshop.Domain;
-using Eshop.Infrastructure;
 using Eshop.Persistence;
 using Eshop.WebApi.Exceptions;
 using FluentValidation;
@@ -8,14 +7,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Eshop.WebApi.Features.Orders
 {
-    public class AddOrder
+    public class UpdateOrder
     {
-        public record Command(AddOrderRequestDto Request) : IRequest<AddOrderResponseDto>;
+        public record Command(int Id, UpdateOrderRequestDto Request) : IRequest<UpdateOrderResponseDto>;
 
         public class Validator : AbstractValidator<Command>
         {
             public Validator()
             {
+                RuleFor(x => x.Id).GreaterThan(0);
                 RuleFor(x => x.Request.Customer).NotEmpty();
                 RuleFor(x => x.Request.Address).NotEmpty();
                 RuleForEach(x => x.Request.Items).ChildRules(x =>
@@ -30,65 +30,81 @@ namespace Eshop.WebApi.Features.Orders
             }
         }
 
-        public class Hanlder : IRequestHandler<Command, AddOrderResponseDto>
+        public class Handler : IRequestHandler<Command, UpdateOrderResponseDto>
         {
             private readonly EshopDbContext dbContext;
-            private readonly IDateTimeProvider dateTimeProvider;
 
-            public Hanlder(EshopDbContext dbContext, IDateTimeProvider dateTimeProvider)
+            public Handler(EshopDbContext dbContext)
             {
                 this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-                this.dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
             }
 
-            public async Task<AddOrderResponseDto> Handle(Command command, CancellationToken cancellationToken)
+            public async Task<UpdateOrderResponseDto> Handle(Command command, CancellationToken cancellationToken)
             {
-                var request = command.Request;
+                var order = await dbContext.Orders.Include(x => x.Items).ThenInclude(i => i.Product).FirstOrDefaultAsync(x => x.Id == command.Id);
+                if (order is null)
+                {
+                    throw new NotFoundException($"Order not found - Id: {command.Id}");
+                }
 
+                var request = command.Request;
+                var orderItems = await GetOrderItems(request, cancellationToken);
+                order.Update(request.Customer, request.Address, orderItems);
+
+                var result = dbContext.Orders.Update(order);
+                await dbContext.SaveChangesAsync(cancellationToken);
+
+                return UpdateOrderResponseDto.Map(result.Entity);
+            }
+
+            private async Task<List<OrderItem>> GetOrderItems(UpdateOrderRequestDto request, CancellationToken cancellationToken)
+            {
                 var orderItems = new List<OrderItem>();
                 foreach (var item in request.Items)
                 {
-                    var product = await dbContext.Products.FirstOrDefaultAsync(x => x.Id == item.ProductId, cancellationToken);
-                    if (product is null)
-                    {
-                        throw new NotFoundException($"Product not found during creation of the order - ID: {item.ProductId}");
-                    }
-
+                    var product = await GetProduct(item, cancellationToken);
                     var orderItem = new OrderItem(item.Quantity, product.Price, product);
                     orderItems.Add(orderItem);
                 }
 
-                var order = new Order(0, request.Customer, request.Address, dateTimeProvider.Now, orderItems);
+                return orderItems;
+            }
 
-                var result = await dbContext.Orders.AddAsync(order, cancellationToken);
-                await dbContext.SaveChangesAsync(cancellationToken);
+            private async Task<Product> GetProduct(UpdateOrderRequestDto.UpdateOrderItemRequestDto item, CancellationToken cancellationToken)
+            {
+                var product = await dbContext.Products.FirstOrDefaultAsync(x => x.Id == item.ProductId, cancellationToken);
+                if (product is null)
+                {
+                    throw new NotFoundException($"Product not found during creation of the order - Product Id: {item.ProductId}");
+                }
 
-                return AddOrderResponseDto.Map(result.Entity);
+                return product;
             }
         }
     }
-    public class AddOrderRequestDto
+
+    public class UpdateOrderRequestDto
     {
         public required string Customer { get; set; }
         public required string Address { get; set; }
-        public required IEnumerable<AddOrderItemRequestDto> Items { get; set; }
+        public required IEnumerable<UpdateOrderItemRequestDto> Items { get; set; }
 
-        public class AddOrderItemRequestDto
+        public class UpdateOrderItemRequestDto
         {
             public int ProductId { get; set; }
             public int Quantity { get; set; }
         }
     }
 
-    public class AddOrderResponseDto
+    public class UpdateOrderResponseDto
     {
         public int Id { get; set; }
         public required string Customer { get; set; }
         public required string Address { get; set; }
-        public required IEnumerable<AddOrderItemResponseDto> Items { get; set; }
+        public required IEnumerable<UpdateOrderItemResponseDto> Items { get; set; }
         public decimal TotalPrice { get; set; }
 
-        public class AddOrderItemResponseDto
+        public class UpdateOrderItemResponseDto
         {
             public int ProductId { get; set; }
             public required string ProductTitle { get; set; }
@@ -97,16 +113,16 @@ namespace Eshop.WebApi.Features.Orders
             public decimal TotalPrice { get; set; }
         }
 
-        internal static AddOrderResponseDto Map(Order result)
+        internal static UpdateOrderResponseDto Map(Order result)
         {
-            return new AddOrderResponseDto
+            return new UpdateOrderResponseDto
             {
                 Id = result.Id,
                 Customer = result.Customer,
                 Address = result.Address,
                 Items = result.Items.Select(x =>
                 {
-                    return new AddOrderItemResponseDto
+                    return new UpdateOrderItemResponseDto
                     {
                         ProductId = x.Product.Id,
                         ProductTitle = x.Product.Title,

@@ -3,7 +3,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Eshop.Persistence
 {
-    [ExcludeFromCodeCoverage]
+    // TODO: Eventually we should test this Entity as well - we do not write however test for Persistence now.
+    // We do not want to move it into Domain as it is having reference to the EF. So new test project is needed.
+    [ExcludeFromCodeCoverage] 
     public class ApplicationUser : IdentityUser
     {
         public string? RefreshToken { get; private set; }

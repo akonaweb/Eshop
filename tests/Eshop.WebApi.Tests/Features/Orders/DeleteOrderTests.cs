@@ -14,11 +14,11 @@ namespace Eshop.WebApi.Tests.Features.Orders
             var order = await dbContext.Orders.AddAsync(OrderMocks.GetOrder1());
             await dbContext.SaveChangesAsync(CancellationToken.None);
 
-            var query = new DeleteOrder.Command(order.Entity.Id);
+            var command = new DeleteOrder.Command(order.Entity.Id);
             var handler = new DeleteOrder.Handler(dbContext);
 
             // act
-            var sut = await handler.Handle(query, CancellationToken.None);
+            var sut = await handler.Handle(command, CancellationToken.None);
 
             // assert
             var result = await dbContext.Orders.ToListAsync(CancellationToken.None);
@@ -29,11 +29,11 @@ namespace Eshop.WebApi.Tests.Features.Orders
         public void DeleteOrder_WithInvalidOrderId_ThrowsNotFoundException()
         {
             // arrange
-            var query = new DeleteOrder.Command(1);
+            var command = new DeleteOrder.Command(1);
             var handler = new DeleteOrder.Handler(dbContext);
 
             // assert
-            Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(query, CancellationToken.None));
+            Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(command, CancellationToken.None));
         }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using Eshop.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Eshop.Persistence
 {
+    [ExcludeFromCodeCoverage]
     internal class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
         public void Configure(EntityTypeBuilder<Product> builder)

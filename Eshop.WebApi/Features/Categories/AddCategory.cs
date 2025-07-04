@@ -39,6 +39,7 @@ namespace Eshop.WebApi.Features.Categories
             }
         }
     }
+
     public class AddCategoryRequestDto
     {
         public required string Name { get; set; }

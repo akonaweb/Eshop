@@ -22,8 +22,8 @@ namespace Eshop.WebApi.Tests.Features.Orders
             {
                 Customer = "Customer",
                 Address = "Address",
-                Items = new List<AddOrderItemRequestDto>
-                {
+                Items =
+                [
                     new AddOrderItemRequestDto
                     {
                         ProductId = product1.Id,
@@ -34,7 +34,7 @@ namespace Eshop.WebApi.Tests.Features.Orders
                         ProductId = product2.Id,
                         Quantity = 3
                     }
-                }
+                ]
             });
             var handler = new AddOrder.Hanlder(dbContext, dateTimeProviderMock.Object);
 
@@ -49,23 +49,23 @@ namespace Eshop.WebApi.Tests.Features.Orders
         public void AddOrder_WithInvalidProductId_ThrowsNotFoundException()
         {
             // arrange
-            var query = new AddOrder.Command(new AddOrderRequestDto
+            var command = new AddOrder.Command(new AddOrderRequestDto
             {
                 Customer = "Customer",
                 Address = "Address",
-                Items = new List<AddOrderItemRequestDto>
+                Items =
+                [
+                    new AddOrderItemRequestDto
                     {
-                        new AddOrderItemRequestDto
-                        {
-                            ProductId = 0,
-                            Quantity = 1
-                        }
+                        ProductId = 0,
+                        Quantity = 1
                     }
+                ]
             });
             var handler = new AddOrder.Hanlder(dbContext, dateTimeProviderMock.Object);
 
             // act/assert
-            Assert.ThrowsAsync<NotFoundException>(async () => await handler.Handle(query, CancellationToken.None));
+            Assert.ThrowsAsync<NotFoundException>(async () => await handler.Handle(command, CancellationToken.None));
         }
     }
 }
