@@ -1,4 +1,5 @@
 using Eshop.Persistence;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
@@ -11,11 +12,21 @@ namespace Eshop.WebApi.Features.Users
 
         public class Handler : IRequestHandler<Command, IResult>
         {
-            private readonly UserManager<ApplicationUser> _userManager;
+            private readonly UserManager<ApplicationUser> userManager;
 
             public Handler(UserManager<ApplicationUser> userManager)
             {
-                _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+                this.userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            }
+
+            public class Validator : AbstractValidator<Command>
+            {
+                public Validator()
+                {
+                    RuleFor(x => x.Request.Email).NotEmpty();
+                    RuleFor(x => x.Request.Password).NotEmpty();
+                    RuleFor(x => x.Request.Password.Length).GreaterThan(7);
+                }
             }
 
             public async Task<IResult> Handle(Command command, CancellationToken cancellationToken)
@@ -23,7 +34,7 @@ namespace Eshop.WebApi.Features.Users
                 var request = command.Request;
 
                 var user = new ApplicationUser(request.Email);
-                var result = await _userManager.CreateAsync(user, request.Password);
+                var result = await userManager.CreateAsync(user, request.Password);
 
                 if (!result.Succeeded)
                 {

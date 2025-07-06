@@ -1,4 +1,5 @@
 ﻿using Eshop.Persistence;
+using Eshop.WebApi.Features.Orders;
 using Eshop.WebApi.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -35,6 +36,8 @@ namespace Eshop.WebApi.Features.Users
         }
 
         [HttpPost("register")]
+        [ProducesResponseType(typeof(RegisterUserResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Register([FromBody] RegisterRequest model)
         {
             var result = await mediator.Send(new RegisterUser.Command(model));
