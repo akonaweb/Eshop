@@ -1,0 +1,7 @@
+{
+  "Value": {
+    "Email": "test@test.com",
+    "UserId": "fake-user-id"
+  },
+  "StatusCode": 200
+}
