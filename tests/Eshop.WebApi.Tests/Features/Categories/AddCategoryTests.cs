@@ -9,14 +9,14 @@ namespace Eshop.WebApi.Tests.Features.Categories
         public async Task AddCategory_ReturnsCorrectDto()
         {
             // arrange
-            var query = new AddCategory.Command(new AddCategoryRequestDto
+            var command = new AddCategory.Command(new AddCategoryRequestDto
             {
                 Name = "Category 1"
             });
             var handler = new AddCategory.Hanlder(dbContext);
 
             // act
-            var sut = await handler.Handle(query, CancellationToken.None);
+            var sut = await handler.Handle(command, CancellationToken.None);
 
             // assert
             sut.ShouldMatchSnapshot();

@@ -1,32 +1,42 @@
 ﻿using Eshop.Persistence;
 using Eshop.WebApi.Exceptions;
 using Eshop.WebApi.Infrastructure;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 
 namespace Eshop.WebApi.Features.Users
 {
-    public class Login
+    public class LoginUser
     {
-        public record Command(LoginRequest Request) : IRequest<LoginResponse>;
+        public record Command(LoginRequest Request) : IRequest<LoginResponseDto>;
 
-        public class Handler : IRequestHandler<Command, LoginResponse>
+        public class Validator : AbstractValidator<Command>
+        {
+            public Validator()
+            {
+                RuleFor(x => x.Request.Email).NotEmpty();
+                RuleFor(x => x.Request.Password).NotEmpty();
+            }
+        }
+
+        public class Handler : IRequestHandler<Command, LoginResponseDto>
         {
             private readonly UserManager<ApplicationUser> userManager;
             private readonly SignInManager<ApplicationUser> signInManager;
-            private readonly IConfiguration configuration;
+            private readonly ITokenManager tokenManager;
 
             public Handler(UserManager<ApplicationUser> userManager,
                            SignInManager<ApplicationUser> signInManager,
-                           IConfiguration configuration)
+                           ITokenManager tokenManager)
             {
                 this.userManager = userManager;
                 this.signInManager = signInManager;
-                this.configuration = configuration;
+                this.tokenManager = tokenManager;
             }
 
-            public async Task<LoginResponse> Handle(Command command, CancellationToken cancellationToken)
+            public async Task<LoginResponseDto> Handle(Command command, CancellationToken cancellationToken)
             {
                 var user = await userManager.FindByEmailAsync(command.Request.Email);
                 if (user is null)
@@ -36,10 +46,9 @@ namespace Eshop.WebApi.Features.Users
                 if (!result.Succeeded)
                     throw new UnauthorizedException("Invalid credentials");
 
-                var tokenManager = new TokenManager(userManager, configuration);
                 var tokens = await tokenManager.GetTokens(user);
 
-                return new LoginResponse
+                return new LoginResponseDto
                 {
                     AccessToken = tokens.AccessToken,
                     RefreshToken = tokens.RefreshToken
@@ -47,7 +56,7 @@ namespace Eshop.WebApi.Features.Users
             }
         }
 
-        public class LoginResponse
+        public class LoginResponseDto
         {
             public required string AccessToken { get; set; }
             public required string RefreshToken { get; set; }

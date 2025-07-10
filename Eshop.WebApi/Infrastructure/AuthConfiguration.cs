@@ -1,8 +1,10 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Eshop.WebApi.Infrastructure
 {
+    [ExcludeFromCodeCoverage]
     public class AuthConfiguration
     {
         public AuthConfiguration(IConfiguration configuration)

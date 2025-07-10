@@ -10,6 +10,15 @@ namespace Eshop.WebApi.Features.Users
     {
         public record Command(RegisterRequest Request) : IRequest<IResult>;
 
+        public class Validator : AbstractValidator<Command>
+        {
+            public Validator()
+            {
+                RuleFor(x => x.Request.Email).NotEmpty();
+                RuleFor(x => x.Request.Password).NotEmpty();
+            }
+        }
+
         public class Handler : IRequestHandler<Command, IResult>
         {
             private readonly UserManager<ApplicationUser> userManager;
@@ -17,15 +26,6 @@ namespace Eshop.WebApi.Features.Users
             public Handler(UserManager<ApplicationUser> userManager)
             {
                 this.userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-            }
-
-            public class Validator : AbstractValidator<Command>
-            {
-                public Validator()
-                {
-                    RuleFor(x => x.Request.Email).NotEmpty();
-                    RuleFor(x => x.Request.Password).NotEmpty();
-                }
             }
 
             public async Task<IResult> Handle(Command command, CancellationToken cancellationToken)
@@ -47,11 +47,11 @@ namespace Eshop.WebApi.Features.Users
                 return Results.Ok(response);
             }
         }
-    }
 
-    public class RegisterUserResponseDto
-    {
-        public required string Email { get; set; }
-        public required string UserId { get; set; }
+        public class RegisterUserResponseDto
+        {
+            public required string Email { get; set; }
+            public required string UserId { get; set; }
+        }
     }
 }

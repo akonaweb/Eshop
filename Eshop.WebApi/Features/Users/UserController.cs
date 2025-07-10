@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
+using static Eshop.WebApi.Features.Users.LoginUser;
+using static Eshop.WebApi.Features.Users.RegisterUser;
 
 namespace Eshop.WebApi.Features.Users
 {
@@ -44,22 +46,13 @@ namespace Eshop.WebApi.Features.Users
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest model)
+        [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var user = await userManager.FindByEmailAsync(model.Email);
-            if (user == null)
-                return Unauthorized("Invalid credentials");
-
-            var result = await signInManager.PasswordSignInAsync(user, model.Password, false, false);
-            if (!result.Succeeded)
-                return Unauthorized("Invalid credentials");
-
-            var tokenManager = new TokenManager(userManager, configuration);
-            var token = await tokenManager.GetTokens(user);
-            return Ok(token);
-
-            //var response = await mediator.Send(new Login.Command(model));
-            //return Ok(response);
+            var response = await mediator.Send(new LoginUser.Command(request));
+            return Ok(response);
         }
 
         [HttpGet("refresh-token")]

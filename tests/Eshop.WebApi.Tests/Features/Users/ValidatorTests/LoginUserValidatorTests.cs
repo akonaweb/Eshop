@@ -4,23 +4,23 @@ using Microsoft.AspNetCore.Identity.Data;
 
 namespace Eshop.WebApi.Tests.Features.Users.ValidatorTests
 {
-    public class RegisterUserValidatorTests
+    public class LoginUserValidatorTests
     {
-        private RegisterUser.Validator validator = null!;
+        private LoginUser.Validator validator = null!;
 
         [SetUp]
         public void Setup()
         {
-            validator = new RegisterUser.Validator();
+            validator = new LoginUser.Validator();
         }
 
         [TestCase(null)]
         [TestCase("")]
         [TestCase(" ")]
-        public void RegisterUserValidator_EmailNotNullOrEmpty(string? email)
+        public void LoginUserValidator_EmailNotNullOrEmpty(string? email)
         {
-            var request = new RegisterRequest { Email = email!, Password = "Valid!Password123" };
-            var command = new RegisterUser.Command(request);
+            var request = new LoginRequest { Email = email!, Password = "Valid!Password123" };
+            var command = new LoginUser.Command(request);
 
             var result = validator.TestValidate(command);
             result.ShouldHaveValidationErrorFor(x => x.Request.Email);
@@ -29,10 +29,10 @@ namespace Eshop.WebApi.Tests.Features.Users.ValidatorTests
         [TestCase(null)]
         [TestCase("")]
         [TestCase(" ")]
-        public void RegisterUserValidator_PasswordNotNullOrEmpty(string? password)
+        public void LoginUserValidator_PasswordNotNullOrEmpty(string? passsword)
         {
-            var request = new RegisterRequest { Email = "valid@email.com", Password = password! };
-            var command = new RegisterUser.Command(request);
+            var request = new LoginRequest { Email = "valid@email.com", Password = passsword! };
+            var command = new LoginUser.Command(request);
 
             var result = validator.TestValidate(command);
             result.ShouldHaveValidationErrorFor(x => x.Request.Password);

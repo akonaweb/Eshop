@@ -1,12 +1,14 @@
 ﻿using Eshop.Persistence;
 using Microsoft.AspNetCore.Identity;
+using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 
 namespace Eshop.WebApi.Infrastructure
 {
-    public class TokenManager
+    [ExcludeFromCodeCoverage]
+    public class TokenManager : ITokenManager
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IConfiguration configuration;

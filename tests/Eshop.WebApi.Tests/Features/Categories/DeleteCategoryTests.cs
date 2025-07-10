@@ -14,11 +14,11 @@ namespace Eshop.WebApi.Tests.Features.Categories
             var category = await dbContext.Categories.AddAsync(CategoryMocks.GetCategory1());
             await dbContext.SaveChangesAsync(CancellationToken.None);
 
-            var query = new DeleteCategory.Command(category.Entity.Id);
+            var command = new DeleteCategory.Command(category.Entity.Id);
             var handler = new DeleteCategory.Handler(dbContext);
 
             // act
-            var sut = await handler.Handle(query, CancellationToken.None);
+            var sut = await handler.Handle(command, CancellationToken.None);
 
             // assert
             var result = await dbContext.Categories.ToListAsync(CancellationToken.None);
@@ -29,11 +29,11 @@ namespace Eshop.WebApi.Tests.Features.Categories
         public void DeleteCategory_WithInvalidCategoryId_ThrowsNotFoundException()
         {
             // arrange
-            var query = new DeleteCategory.Command(1);
+            var command = new DeleteCategory.Command(1);
             var handler = new DeleteCategory.Handler(dbContext);
 
             // assert
-            Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(query, CancellationToken.None));
+            Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(command, CancellationToken.None));
         }
     }
 }
