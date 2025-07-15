@@ -1,7 +1,9 @@
-﻿using System.Security.Claims;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Security.Claims;
 
 namespace Eshop.WebApi.Infrastructure
 {
+    [ExcludeFromCodeCoverage]
     public class UserContext : IUserContext
     {
         private readonly IHttpContextAccessor httpContextAccessor;

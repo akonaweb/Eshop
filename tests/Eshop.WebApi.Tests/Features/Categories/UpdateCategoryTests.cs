@@ -30,11 +30,11 @@ namespace Eshop.WebApi.Tests.Features.Categories
         {
             // arrange
             var requestDto = new UpdateCategoryRequestDto { Name = "Category 2" };
-            var query = new UpdateCategory.Command(1, requestDto);
+            var command = new UpdateCategory.Command(1, requestDto);
             var handler = new UpdateCategory.Handler(dbContext);
 
             // act/assert
-            Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(query, CancellationToken.None));
+            Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(command, CancellationToken.None));
         }
     }
 }

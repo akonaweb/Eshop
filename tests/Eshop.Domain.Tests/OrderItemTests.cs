@@ -2,7 +2,6 @@
 
 namespace Eshop.Domain.Tests
 {
-    [TestFixture]
     public class OrderItemTests
     {
         [Test]

@@ -15,11 +15,11 @@ namespace Eshop.WebApi.Tests.Features.Products
             var product = await dbContext.Products.AddAsync(ProductMocks.GetProduct1());
             await dbContext.SaveChangesAsync(CancellationToken.None);
 
-            var query = new DeleteProduct.Command(product.Entity.Id);
+            var command = new DeleteProduct.Command(product.Entity.Id);
             var handler = new DeleteProduct.Handler(dbContext);
 
             // act
-            var sut = await handler.Handle(query, CancellationToken.None);
+            var sut = await handler.Handle(command, CancellationToken.None);
 
             // assert
             var result = await dbContext.Products.ToListAsync(CancellationToken.None);
@@ -30,11 +30,11 @@ namespace Eshop.WebApi.Tests.Features.Products
         public void DeleteProduct_WithInvalidProductId_ThrowsNotFoundException()
         {
             // arrange
-            var query = new DeleteProduct.Command(1);
+            var command = new DeleteProduct.Command(1);
             var handler = new DeleteProduct.Handler(dbContext);
 
             // act/assert
-            Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(query, CancellationToken.None));
+            Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(command, CancellationToken.None));
         }
     }
 }

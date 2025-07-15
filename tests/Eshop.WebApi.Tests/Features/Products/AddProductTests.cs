@@ -14,7 +14,7 @@ namespace Eshop.WebApi.Tests.Features.Products
             var category = await dbContext.Categories.AddAsync(CategoryMocks.GetCategory1());
             await dbContext.SaveChangesAsync(CancellationToken.None);
 
-            var query = new AddProduct.Command(new AddProductRequestDto
+            var command = new AddProduct.Command(new AddProductRequestDto
             {
                 Title = "Title",
                 Description = "Description",
@@ -24,7 +24,7 @@ namespace Eshop.WebApi.Tests.Features.Products
             var handler = new AddProduct.Handler(dbContext);
 
             // act
-            var sut = await handler.Handle(query, CancellationToken.None);
+            var sut = await handler.Handle(command, CancellationToken.None);
 
             // assert
             sut.ShouldMatchSnapshot();
@@ -34,7 +34,7 @@ namespace Eshop.WebApi.Tests.Features.Products
         public void AddProduct_WithInvalidCategoryId_ThrowsNotFoundException()
         {
             // arrange
-            var query = new AddProduct.Command(new AddProductRequestDto
+            var command = new AddProduct.Command(new AddProductRequestDto
             {
                 Title = "Title",
                 Description = "Description",
@@ -45,7 +45,7 @@ namespace Eshop.WebApi.Tests.Features.Products
             var handler = new AddProduct.Handler(dbContext);
 
             // act/assert
-            Assert.ThrowsAsync<NotFoundException>(async () => await handler.Handle(query, CancellationToken.None));
+            Assert.ThrowsAsync<NotFoundException>(async () => await handler.Handle(command, CancellationToken.None));
         }
     }
 }

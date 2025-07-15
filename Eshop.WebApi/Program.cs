@@ -39,6 +39,7 @@ static void SetupControllers(MvcOptions options)
 static void SetupServices(IServiceCollection services)
 {
     services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+    services.AddScoped<ITokenManager, TokenManager>();
 }
 
 static void SetupSwagger(WebApplicationBuilder builder)

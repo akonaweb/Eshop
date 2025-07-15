@@ -27,7 +27,6 @@ namespace Eshop.WebApi.Tests.Features.Orders
             };
 
             var query = new UpdateOrder.Command(1, requestDto);
-
             var handler = new UpdateOrder.Handler(dbContext);
 
             // Act & Assert

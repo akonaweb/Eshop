@@ -1,10 +1,8 @@
 ﻿using Eshop.Shared.Tests.Mocks;
 using Eshop.Shared.Tests.Utils;
-using Eshop.WebApi.Exceptions;
 
 namespace Eshop.Domain.Tests
 {
-    [TestFixture]
     public class OrderTests
     {
         [Test]

@@ -22,11 +22,11 @@ namespace Eshop.WebApi.Tests.Features.Products
                 Price = 2,
                 CategoryId = category2.Entity.Id
             };
-            var query = new UpdateProduct.Command(product.Entity.Id, requestDto);
+            var command = new UpdateProduct.Command(product.Entity.Id, requestDto);
             var handler = new UpdateProduct.Handler(dbContext);
 
             /// act
-            var sut = await handler.Handle(query, CancellationToken.None);
+            var sut = await handler.Handle(command, CancellationToken.None);
 
             // assert
             sut.ShouldMatchSnapshot();
@@ -42,11 +42,11 @@ namespace Eshop.WebApi.Tests.Features.Products
                 Description = "Descritpion",
                 Price = 1,
             };
-            var query = new UpdateProduct.Command(1, requestDto);
+            var command = new UpdateProduct.Command(1, requestDto);
             var handler = new UpdateProduct.Handler(dbContext);
 
             // act/assert
-            Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(query, CancellationToken.None));
+            Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(command, CancellationToken.None));
         }
 
         [Test]
@@ -64,11 +64,11 @@ namespace Eshop.WebApi.Tests.Features.Products
                 CategoryId = 2
             };
 
-            var query = new UpdateProduct.Command(product.Entity.Id, requestDto);
+            var command = new UpdateProduct.Command(product.Entity.Id, requestDto);
             var handler = new UpdateProduct.Handler(dbContext);
 
             // act/assert
-            Assert.ThrowsAsync<NotFoundException>(async () => await handler.Handle(query, CancellationToken.None));
+            Assert.ThrowsAsync<NotFoundException>(async () => await handler.Handle(command, CancellationToken.None));
         }
     }
 }
