@@ -1,4 +1,5 @@
-﻿using Eshop.Persistence;
+﻿using Eshop.Infrastructure;
+using Eshop.Persistence;
 using Microsoft.AspNetCore.Identity;
 using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,18 +13,20 @@ namespace Eshop.WebApi.Infrastructure
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IConfiguration configuration;
+        private readonly IDateTimeProvider dateTimeProvider;
 
-        public TokenManager(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        public TokenManager(UserManager<ApplicationUser> userManager, IConfiguration configuration, IDateTimeProvider dateTimeProvider)
         {
             this.userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this.dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         }
 
         public async Task<TokensResponse> GetTokens(ApplicationUser user)
         {
             var accessToken = await GenerateAccessToken(user);
             var refreshToken = GenerateRefreshToken();
-            user.UpdateRefreshToken(refreshToken);
+            user.UpdateRefreshToken(refreshToken, dateTimeProvider.Now.AddDays(7));
             await userManager.UpdateAsync(user);
 
             return new TokensResponse(accessToken, refreshToken);

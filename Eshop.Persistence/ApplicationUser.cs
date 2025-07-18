@@ -22,10 +22,10 @@ namespace Eshop.Persistence
             RefreshTokenExpiryDate = null;
         }
 
-        public void UpdateRefreshToken(string refreshToken)
+        public void UpdateRefreshToken(string refreshToken, DateTime expiryDate)
         {
             RefreshToken = refreshToken;
-            RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
+            RefreshTokenExpiryDate = expiryDate;
         }
     }
 }
