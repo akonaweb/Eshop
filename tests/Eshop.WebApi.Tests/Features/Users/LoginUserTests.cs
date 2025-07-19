@@ -1,9 +1,6 @@
 ﻿using Eshop.Persistence;
 using Eshop.WebApi.Exceptions;
-using Eshop.WebApi.Features.Products;
 using Eshop.WebApi.Features.Users;
-using Eshop.WebApi.Infrastructure;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Moq;
@@ -60,6 +57,7 @@ namespace Eshop.WebApi.Tests.Features.Users
             var command = new LoginUser.Command(request);
             var handler = new LoginUser.Handler(userManagerMock.Object, signInManagerMock.Object, tokenManagerMock.Object);
 
+            // act/assert
             Assert.ThrowsAsync<UnauthorizedException>(() => handler.Handle(command, CancellationToken.None));
         }
 
@@ -82,6 +80,7 @@ namespace Eshop.WebApi.Tests.Features.Users
             var command = new LoginUser.Command(request);
             var handler = new LoginUser.Handler(userManagerMock.Object, signInManagerMock.Object, tokenManagerMock.Object);
 
+            // act/assert
             Assert.ThrowsAsync<UnauthorizedException>(() => handler.Handle(command, CancellationToken.None));
         }
     }

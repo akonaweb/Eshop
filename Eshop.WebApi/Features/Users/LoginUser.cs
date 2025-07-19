@@ -31,9 +31,9 @@ namespace Eshop.WebApi.Features.Users
                            SignInManager<ApplicationUser> signInManager,
                            ITokenManager tokenManager)
             {
-                this.userManager = userManager;
-                this.signInManager = signInManager;
-                this.tokenManager = tokenManager;
+                this.userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+                this.signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
+                this.tokenManager = tokenManager ?? throw new ArgumentNullException(nameof(tokenManager));
             }
 
             public async Task<LoginResponseDto> Handle(Command command, CancellationToken cancellationToken)

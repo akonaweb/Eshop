@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
 using static Eshop.WebApi.Features.Users.LoginUser;
+using static Eshop.WebApi.Features.Users.RefreshTokens;
 using static Eshop.WebApi.Features.Users.RegisterUser;
 
 namespace Eshop.WebApi.Features.Users
@@ -55,17 +55,14 @@ namespace Eshop.WebApi.Features.Users
             return Ok(response);
         }
 
-        [HttpGet("refresh-token")]
-        public async Task<IActionResult> RefreshToken(string oldRefreshToken)
+        [HttpGet("refresh-tokens")]
+        [ProducesResponseType(typeof(RefreshTokensResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> RefreshTokens(string refreshToken)
         {
-            var user = await userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == oldRefreshToken);
-
-            if (user == null || user.RefreshTokenExpiryDate <= DateTime.UtcNow)
-                return Unauthorized("Invalid or expired refresh token.");
-
-            var tokenManager = new TokenManager(userManager, configuration);
-            var token = await tokenManager.GetTokens(user);
-            return Ok(token);
+            var response = await mediator.Send(new RefreshTokens.Command(refreshToken));
+            return Ok(response);
         }
 
         [Authorize]

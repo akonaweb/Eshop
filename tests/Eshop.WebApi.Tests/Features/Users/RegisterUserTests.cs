@@ -10,7 +10,7 @@ namespace Eshop.WebApi.Tests.Features.Users
     public class RegisterUserTests : TestBase
     {
         [Test]
-        public async Task RegisterUser_WithValidEmailAndPassword_ReturnsCorrectResponse()
+        public async Task RegisterUser_WithValidEmailAndPassword_ReturnsCorrectDto()
         {
             // arrange
             var email = "test@test.com";
