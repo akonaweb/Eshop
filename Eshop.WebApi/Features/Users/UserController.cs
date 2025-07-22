@@ -67,20 +67,13 @@ namespace Eshop.WebApi.Features.Users
 
         [Authorize]
         [HttpPost("change-password")]
+        [ProducesResponseType(typeof(RegisterUserResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest model)
         {
-            var userId = userContext.GetUserId();
-            var user = await userManager.FindByIdAsync(userId.ToString());
-            if (user == null) return NotFound();
-
-            var changeResult = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
-            if (!changeResult.Succeeded)
-            {
-                var errors = changeResult.Errors.Select(e => e.Description);
-                return BadRequest(new { Errors = errors });
-            }
-
-            return Ok("Password changed successfully.");
+            var response = await mediator.Send(new ChangePassword.Command(model));
+            return Ok(response);
         }
 
         [HttpPost("forgot-password")]
