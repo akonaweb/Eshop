@@ -40,11 +40,11 @@ namespace Eshop.WebApi.Features.Users
             {
                 var user = await userManager.FindByEmailAsync(command.Request.Email);
                 if (user is null)
-                    throw new UnauthorizedException("Invalid credentials");
+                    throw new UnauthorizedException("Invalid credentials.");
 
                 var result = await signInManager.PasswordSignInAsync(user, command.Request.Password, false, false);
                 if (!result.Succeeded)
-                    throw new UnauthorizedException("Invalid credentials");
+                    throw new UnauthorizedException("Invalid credentials.");
 
                 var tokens = await tokenManager.GetTokens(user);
 

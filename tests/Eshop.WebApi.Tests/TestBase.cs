@@ -19,6 +19,7 @@ namespace Eshop.WebApi.Tests
         protected Mock<UserManager<ApplicationUser>> userManagerMock;
         protected Mock<SignInManager<ApplicationUser>> signInManagerMock;
         protected Mock<ITokenManager> tokenManagerMock;
+        protected Mock<IUserContext> userContextMock;
 
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
@@ -41,6 +42,7 @@ namespace Eshop.WebApi.Tests
             var userClaimsPrincipalFactoryMock = new Mock<IUserClaimsPrincipalFactory<ApplicationUser>>();
             signInManagerMock = new Mock<SignInManager<ApplicationUser>>(userManagerMock.Object, httpContextAccessorMock.Object, userClaimsPrincipalFactoryMock.Object, null!, null!, null!, null!);
             tokenManagerMock = new Mock<ITokenManager>();
+            userContextMock = new Mock<IUserContext>();
         }
 
         [TearDown]
