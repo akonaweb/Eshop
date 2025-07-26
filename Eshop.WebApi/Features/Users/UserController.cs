@@ -77,18 +77,13 @@ namespace Eshop.WebApi.Features.Users
         }
 
         [HttpPost("forgot-password")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest model)
         {
-            var user = await userManager.FindByEmailAsync(model.Email);
-            if (user == null)
-                return BadRequest("User not found."); // Here you should send Ok() result to not show that user exists in DB.
-
-            var token = await userManager.GeneratePasswordResetTokenAsync(user);
-
-            //var resetUrl = $"{configuration["FrontendUrl"]}/reset-password?token={WebUtility.UrlEncode(token)}&email={user.Email}";
-            //await emailSender.SendEmailAsync(user.Email, "Reset Password", $"Click <a href='{resetUrl}'>here</a> to reset your password.");
-
-            return Ok(new { token }); // "Reset password link sent."
+            var response = await mediator.Send(new ForgotPassword.Command(model));
+            return Ok(response);
         }
 
         [HttpPost("forgot-password-confirm")]
@@ -105,7 +100,6 @@ namespace Eshop.WebApi.Features.Users
 
             return Ok("Password has been reset.");
         }
-
     }
 
     public class ChangePasswordRequest
