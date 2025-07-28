@@ -22,14 +22,9 @@ namespace Eshop.WebApi.Tests.Features.Users
             userManagerMock.Setup(x => x.ChangePasswordAsync(user, currentPassword, newPassword))
                            .ReturnsAsync(IdentityResult.Success);
 
-            var request = new ChangePasswordRequest
-            {
-                CurrentPassword = currentPassword,
-                NewPassword = newPassword
-            };
-
-            var handler = new ChangePassword.Handler(userManagerMock.Object, userContextMock.Object);
+            var request = new ChangePasswordRequestDto { CurrentPassword = currentPassword, NewPassword = newPassword };
             var command = new ChangePassword.Command(request);
+            var handler = new ChangePassword.Handler(userManagerMock.Object, userContextMock.Object);
 
             // act
             var result = await handler.Handle(command, CancellationToken.None);
@@ -50,14 +45,9 @@ namespace Eshop.WebApi.Tests.Features.Users
             userContextMock.Setup(x => x.GetUserId()).Returns(userId);
             userManagerMock.Setup(x => x.FindByIdAsync(userId.ToString())).ReturnsAsync(user);
 
-            var request = new ChangePasswordRequest
-            {
-                CurrentPassword = currentPassword,
-                NewPassword = newPassword
-            };
-
-            var handler = new ChangePassword.Handler(userManagerMock.Object, userContextMock.Object);
+            var request = new ChangePasswordRequestDto { CurrentPassword = currentPassword, NewPassword = newPassword };
             var command = new ChangePassword.Command(request);
+            var handler = new ChangePassword.Handler(userManagerMock.Object, userContextMock.Object);
 
             // act
             var result = await handler.Handle(command, CancellationToken.None);
@@ -80,14 +70,9 @@ namespace Eshop.WebApi.Tests.Features.Users
             userManagerMock.Setup(x => x.ChangePasswordAsync(user, currentPassword, newPassword))
                            .ReturnsAsync(IdentityResult.Failed([new IdentityError { Code = "400", Description = "Incorrect new password." }]));
 
-            var request = new ChangePasswordRequest
-            {
-                CurrentPassword = currentPassword,
-                NewPassword = newPassword
-            };
-
-            var handler = new ChangePassword.Handler(userManagerMock.Object, userContextMock.Object);
+            var request = new ChangePasswordRequestDto { CurrentPassword = currentPassword, NewPassword = newPassword };
             var command = new ChangePassword.Command(request);
+            var handler = new ChangePassword.Handler(userManagerMock.Object, userContextMock.Object);
 
             // act
             var result = await handler.Handle(command, CancellationToken.None);

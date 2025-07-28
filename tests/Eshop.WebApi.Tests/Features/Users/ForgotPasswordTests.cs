@@ -1,6 +1,5 @@
 ﻿using Eshop.Persistence;
 using Eshop.WebApi.Features.Users;
-using Microsoft.AspNetCore.Identity.Data;
 using Moq;
 using Snapper;
 
@@ -9,7 +8,7 @@ namespace Eshop.WebApi.Tests.Features.Users
     public class ForgotPasswordTests : TestBase
     {
         [Test]
-        public async Task ForgotPassword_WithCorrectCredentials_ReturnTokens()
+        public async Task ForgotPassword_WithCorrectCredentials_ReturnsPasswordResetRequest()
         {
             // arrange
             var email = "test@test.com";
@@ -19,7 +18,7 @@ namespace Eshop.WebApi.Tests.Features.Users
             userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(user);
             userManagerMock.Setup(um => um.GeneratePasswordResetTokenAsync(user)).ReturnsAsync(token);
 
-            var request = new ForgotPasswordRequest { Email = email };
+            var request = new ForgotPasswordRequestDto { Email = email };
             var command = new ForgotPassword.Command(request);
             var handler = new ForgotPassword.Handler(userManagerMock.Object);
 
@@ -41,7 +40,7 @@ namespace Eshop.WebApi.Tests.Features.Users
             userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(user);
             userManagerMock.Setup(um => um.GeneratePasswordResetTokenAsync(user)).ReturnsAsync(token);
 
-            var request = new ForgotPasswordRequest { Email = email };
+            var request = new ForgotPasswordRequestDto { Email = email };
             var command = new ForgotPassword.Command(request);
             var handler = new ForgotPassword.Handler(userManagerMock.Object);
 

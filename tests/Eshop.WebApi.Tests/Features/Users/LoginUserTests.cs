@@ -2,7 +2,6 @@
 using Eshop.WebApi.Exceptions;
 using Eshop.WebApi.Features.Users;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
 using Moq;
 using Snapper;
 using static Eshop.WebApi.Infrastructure.TokenManager;
@@ -23,16 +22,11 @@ namespace Eshop.WebApi.Tests.Features.Users
             signInManagerMock.Setup(sm => sm.PasswordSignInAsync(user, password, false, false)).ReturnsAsync(SignInResult.Success);
             tokenManagerMock.Setup(x => x.GetTokens(user)).ReturnsAsync(new TokensResponse("access-token", "refresh-token"));
 
+            var request = new LoginRequestDto { Email = email, Password = password };
+            var command = new LoginUser.Command(request);
             var handler = new LoginUser.Handler(userManagerMock.Object, signInManagerMock.Object, tokenManagerMock.Object);
 
-            var request = new LoginRequest
-            {
-                Email = email,
-                Password = password
-            };
-
             // act
-            var command = new LoginUser.Command(request);
             var result = await handler.Handle(command, CancellationToken.None);
 
             // assert
@@ -49,11 +43,7 @@ namespace Eshop.WebApi.Tests.Features.Users
 
             userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(user);
 
-            var request = new LoginRequest
-            {
-                Email = email,
-                Password = password
-            };
+            var request = new LoginRequestDto { Email = email, Password = password };
             var command = new LoginUser.Command(request);
             var handler = new LoginUser.Handler(userManagerMock.Object, signInManagerMock.Object, tokenManagerMock.Object);
 
@@ -72,11 +62,7 @@ namespace Eshop.WebApi.Tests.Features.Users
             userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(user);
             signInManagerMock.Setup(sm => sm.PasswordSignInAsync(user, password, false, false)).ReturnsAsync(SignInResult.Failed);
 
-            var request = new LoginRequest
-            {
-                Email = email,
-                Password = password
-            };
+            var request = new LoginRequestDto { Email = email, Password = password };
             var command = new LoginUser.Command(request);
             var handler = new LoginUser.Handler(userManagerMock.Object, signInManagerMock.Object, tokenManagerMock.Object);
 

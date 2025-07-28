@@ -2,13 +2,12 @@ using Eshop.Persistence;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
 
 namespace Eshop.WebApi.Features.Users
 {
     public class RegisterUser
     {
-        public record Command(RegisterRequest Request) : IRequest<IResult>;
+        public record Command(RegisterUserRequestDto Request) : IRequest<IResult>;
 
         public class Validator : AbstractValidator<Command>
         {
@@ -47,11 +46,17 @@ namespace Eshop.WebApi.Features.Users
                 return Results.Ok(response);
             }
         }
+    }
 
-        public class RegisterUserResponseDto
-        {
-            public required string Email { get; set; }
-            public required string UserId { get; set; }
-        }
+    public class RegisterUserRequestDto
+    {
+        public required string Email { get; set; }
+        public required string Password { get; set; }
+    }
+
+    public class RegisterUserResponseDto
+    {
+        public required string Email { get; set; }
+        public required string UserId { get; set; }
     }
 }

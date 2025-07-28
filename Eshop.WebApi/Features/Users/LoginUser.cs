@@ -4,13 +4,12 @@ using Eshop.WebApi.Infrastructure;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
 
 namespace Eshop.WebApi.Features.Users
 {
     public class LoginUser
     {
-        public record Command(LoginRequest Request) : IRequest<LoginResponseDto>;
+        public record Command(LoginRequestDto Request) : IRequest<LoginResponseDto>;
 
         public class Validator : AbstractValidator<Command>
         {
@@ -55,11 +54,17 @@ namespace Eshop.WebApi.Features.Users
                 };
             }
         }
+    }
 
-        public class LoginResponseDto
-        {
-            public required string AccessToken { get; set; }
-            public required string RefreshToken { get; set; }
-        }
+    public sealed class LoginRequestDto
+    {
+        public required string Email { get; set; }
+        public required string Password { get; set; }
+    }
+
+    public class LoginResponseDto
+    {
+        public required string AccessToken { get; set; }
+        public required string RefreshToken { get; set; }
     }
 }
