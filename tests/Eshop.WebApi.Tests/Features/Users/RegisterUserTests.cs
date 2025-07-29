@@ -1,7 +1,6 @@
 ﻿using Eshop.Persistence;
 using Eshop.WebApi.Features.Users;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
 using Moq;
 using Snapper;
 
@@ -21,7 +20,8 @@ namespace Eshop.WebApi.Tests.Features.Users
                 .Callback<ApplicationUser, string>((user, _) => user.Id = "fake-user-id")
                 .ReturnsAsync(IdentityResult.Success);
 
-            var command = new RegisterUser.Command(new RegisterRequest { Email = email, Password = password });
+            var request = new RegisterUserRequestDto { Email = email, Password = password };
+            var command = new RegisterUser.Command(request);
             var handler = new RegisterUser.Handler(userManagerMock.Object);
 
             // act
@@ -42,7 +42,8 @@ namespace Eshop.WebApi.Tests.Features.Users
             var failedResult = IdentityResult.Failed(identityError);
             userManagerMock.Setup(um => um.CreateAsync(It.IsAny<ApplicationUser>(), password)).ReturnsAsync(failedResult);
 
-            var command = new RegisterUser.Command(new RegisterRequest { Email = email, Password = password });
+            var request = new RegisterUserRequestDto { Email = email, Password = password };
+            var command = new RegisterUser.Command(request);
             var handler = new RegisterUser.Handler(userManagerMock.Object);
 
             // act

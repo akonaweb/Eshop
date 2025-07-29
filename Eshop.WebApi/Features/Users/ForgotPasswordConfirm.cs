@@ -1,19 +1,20 @@
-﻿using Eshop.Persistence;
-using Eshop.WebApi.Infrastructure;
+using Eshop.Persistence;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
 namespace Eshop.WebApi.Features.Users
 {
-    public class ChangePassword
+    public class ForgotPasswordConfirm
     {
-        public record Command(ChangePasswordRequestDto Request) : IRequest<IResult>;
+        public record Command(ForgotPasswordConfirmRequestDto Request) : IRequest<IResult>;
 
         public class Validator : AbstractValidator<Command>
         {
             public Validator()
             {
+                RuleFor(x => x.Request.Email).NotEmpty();
+                RuleFor(x => x.Request.ResetCode).NotEmpty();
                 RuleFor(x => x.Request.NewPassword).NotEmpty();
             }
         }
@@ -21,35 +22,32 @@ namespace Eshop.WebApi.Features.Users
         public class Handler : IRequestHandler<Command, IResult>
         {
             private readonly UserManager<ApplicationUser> userManager;
-            private readonly IUserContext userContext;
 
-            public Handler(UserManager<ApplicationUser> userManager, IUserContext userContext)
+            public Handler(UserManager<ApplicationUser> userManager)
             {
                 this.userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-                this.userContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
             }
 
             public async Task<IResult> Handle(Command request, CancellationToken cancellationToken)
             {
                 var model = request.Request;
-                var userId = userContext.GetUserId();
-                var user = await userManager.FindByIdAsync(userId.ToString());
-
+                var user = await userManager.FindByEmailAsync(model.Email);
                 if (user == null)
-                    return Results.NotFound("User not found.");
+                    return Results.BadRequest("Invalid request.");
 
-                var result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+                var result = await userManager.ResetPasswordAsync(user, model.ResetCode, model.NewPassword);
                 if (!result.Succeeded)
                     return Results.BadRequest(result.Errors);
 
-                return Results.Ok("Password changed successfully");
+                return Results.Ok("Password has been reset.");
             }
         }
     }
 
-    public class ChangePasswordRequestDto
+    public sealed class ForgotPasswordConfirmRequestDto
     {
-        public required string CurrentPassword { get; set; }
+        public required string Email { get; set; }
+        public required string ResetCode { get; set; }
         public required string NewPassword { get; set; }
     }
 }

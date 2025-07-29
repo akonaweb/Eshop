@@ -8,7 +8,7 @@ namespace Eshop.WebApi.Tests.Features.Users.ValidatorTests
         private ChangePassword.Validator validator = null!;
 
         [SetUp]
-        public void SetUp() 
+        public void SetUp()
         {
             validator = new ChangePassword.Validator();
         }
@@ -18,15 +18,9 @@ namespace Eshop.WebApi.Tests.Features.Users.ValidatorTests
         [TestCase(" ")]
         public void ChangePasswordUser_NewPasswordNotNullOrEmpty(string? newpassword)
         {
-            var request = new ChangePasswordRequest
-            {
-                CurrentPassword = "Valid!Password123",
-                NewPassword = newpassword!
-            };
+            var request = new ChangePasswordRequestDto { CurrentPassword = "Valid!Password123", NewPassword = newpassword! };
             var command = new ChangePassword.Command(request);
-
             var result = validator.TestValidate(command);
-
             result.ShouldHaveValidationErrorFor(x => x.Request.NewPassword);
         }
     }

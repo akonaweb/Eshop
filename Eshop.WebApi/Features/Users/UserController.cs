@@ -1,45 +1,27 @@
-﻿using Eshop.Persistence;
-using Eshop.WebApi.Infrastructure;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.CodeAnalysis;
-using static Eshop.WebApi.Features.Users.LoginUser;
-using static Eshop.WebApi.Features.Users.RefreshTokens;
-using static Eshop.WebApi.Features.Users.RegisterUser;
 
 namespace Eshop.WebApi.Features.Users
 {
     [ExcludeFromCodeCoverage]
     [ApiController]
     [Route("[controller]")]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public class UserController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
-        private readonly IUserContext userContext;
-        private readonly IConfiguration configuration;
         private readonly IMediator mediator;
 
-        public UserController(UserManager<ApplicationUser> userManager,
-                              SignInManager<ApplicationUser> signInManager,
-                              IUserContext userContext,
-                              IConfiguration configuration,
-                              IMediator mediator)
+        public UserController(IMediator mediator)
         {
-            this.userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-            this.signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
-            this.userContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
-            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
         [HttpPost("register")]
         [ProducesResponseType(typeof(RegisterUserResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        public async Task<ActionResult<RegisterUserResponseDto>> Register(RegisterUserRequestDto request)
         {
             var result = await mediator.Send(new RegisterUser.Command(request));
             return Ok(result);
@@ -49,62 +31,49 @@ namespace Eshop.WebApi.Features.Users
         [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<ActionResult<LoginResponseDto>> Login(LoginRequestDto request)
         {
-            var response = await mediator.Send(new LoginUser.Command(request));
-            return Ok(response);
+            var result = await mediator.Send(new LoginUser.Command(request));
+            return Ok(result);
         }
 
         [HttpGet("refresh-tokens")]
         [ProducesResponseType(typeof(RefreshTokensResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> RefreshTokens(string refreshToken)
+        public async Task<ActionResult<RefreshTokensResponseDto>> RefreshTokens(string refreshToken)
         {
-            var response = await mediator.Send(new RefreshTokens.Command(refreshToken));
-            return Ok(response);
+            var result = await mediator.Send(new RefreshTokens.Command(refreshToken));
+            return Ok(result);
         }
 
         [Authorize]
         [HttpPost("change-password")]
-        [ProducesResponseType(typeof(RegisterUserResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest model)
+        public async Task<ActionResult> ChangePassword(ChangePasswordRequestDto request)
         {
-            var response = await mediator.Send(new ChangePassword.Command(model));
-            return Ok(response);
+            await mediator.Send(new ChangePassword.Command(request));
+            return Ok("Password changed successfully.");
         }
 
         [HttpPost("forgot-password")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest model)
+        public async Task<ActionResult<string>> ForgotPassword(ForgotPasswordRequestDto request)
         {
-            var response = await mediator.Send(new ForgotPassword.Command(model));
-            return Ok(response);
+            var result = await mediator.Send(new ForgotPassword.Command(request));
+            return Ok(result);
         }
 
         [HttpPost("forgot-password-confirm")]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest model)
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<string>> ForgotPasswordConfirm(ForgotPasswordConfirmRequestDto request)
         {
-            var user = await userManager.FindByEmailAsync(model.Email);
-            if (user == null)
-                return BadRequest("Invalid request.");
-
-            var result = await userManager.ResetPasswordAsync(user, model.ResetCode, model.NewPassword);
-
-            if (!result.Succeeded)
-                return BadRequest(result.Errors);
-
-            return Ok("Password has been reset.");
+            var result = await mediator.Send(new ForgotPasswordConfirm.Command(request));
+            return Ok(result);
         }
-    }
-
-    public class ChangePasswordRequest
-    {
-        public required string CurrentPassword { get; set; }
-        public required string NewPassword { get; set; }
     }
 }

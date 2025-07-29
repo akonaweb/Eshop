@@ -18,7 +18,7 @@ namespace Eshop.WebApi.Tests.Features.Orders
                 Address = "Valid Address",
                 Items =
                 [
-                    new UpdateOrderRequestDto.UpdateOrderItemRequestDto
+                    new UpdateOrderItemRequestDto
                     {
                         ProductId = 1,
                         Quantity = 1
@@ -75,12 +75,12 @@ namespace Eshop.WebApi.Tests.Features.Orders
                 Address = "Updated Address",
                 Items =
                 [
-                    new UpdateOrderRequestDto.UpdateOrderItemRequestDto
+                    new UpdateOrderItemRequestDto
                     {
                         ProductId = 1,
                         Quantity = 2
                     },
-                    new UpdateOrderRequestDto.UpdateOrderItemRequestDto
+                    new UpdateOrderItemRequestDto
                     {
                         ProductId = 3,
                         Quantity = 3

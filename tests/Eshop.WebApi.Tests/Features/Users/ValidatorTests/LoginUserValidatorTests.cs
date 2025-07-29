@@ -1,6 +1,5 @@
 ﻿using Eshop.WebApi.Features.Users;
 using FluentValidation.TestHelper;
-using Microsoft.AspNetCore.Identity.Data;
 
 namespace Eshop.WebApi.Tests.Features.Users.ValidatorTests
 {
@@ -19,9 +18,8 @@ namespace Eshop.WebApi.Tests.Features.Users.ValidatorTests
         [TestCase(" ")]
         public void LoginUserValidator_EmailNotNullOrEmpty(string? email)
         {
-            var request = new LoginRequest { Email = email!, Password = "Valid!Password123" };
+            var request = new LoginRequestDto { Email = email!, Password = "Valid!Password123" };
             var command = new LoginUser.Command(request);
-
             var result = validator.TestValidate(command);
             result.ShouldHaveValidationErrorFor(x => x.Request.Email);
         }
@@ -31,9 +29,8 @@ namespace Eshop.WebApi.Tests.Features.Users.ValidatorTests
         [TestCase(" ")]
         public void LoginUserValidator_PasswordNotNullOrEmpty(string? passsword)
         {
-            var request = new LoginRequest { Email = "valid@email.com", Password = passsword! };
+            var request = new LoginRequestDto { Email = "valid@email.com", Password = passsword! };
             var command = new LoginUser.Command(request);
-
             var result = validator.TestValidate(command);
             result.ShouldHaveValidationErrorFor(x => x.Request.Password);
         }

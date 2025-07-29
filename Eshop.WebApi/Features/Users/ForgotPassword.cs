@@ -2,13 +2,12 @@ using Eshop.Persistence;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
 
 namespace Eshop.WebApi.Features.Users
 {
     public class ForgotPassword
     {
-        public record Command(ForgotPasswordRequest Request) : IRequest<IResult>;
+        public record Command(ForgotPasswordRequestDto Request) : IRequest<IResult>;
 
         public class Validator : AbstractValidator<Command>
         {
@@ -43,5 +42,10 @@ namespace Eshop.WebApi.Features.Users
                 return Results.Ok(message);
             }
         }
+    }
+
+    public class ForgotPasswordRequestDto
+    {
+        public required string Email { get; set; }
     }
 }
