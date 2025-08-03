@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.CodeAnalysis;
 
@@ -35,6 +36,7 @@ namespace Eshop.WebApi.Features.Categories
             return Ok(result);
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpPost(Name = nameof(AddCategory))]
         [ProducesResponseType(typeof(AddCategoryResponseDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -44,6 +46,7 @@ namespace Eshop.WebApi.Features.Categories
             return CreatedAtAction(nameof(GetCategory), new { id = result.Id }, result);
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpPut("{id}", Name = nameof(UpdateCategory))]
         [ProducesResponseType(typeof(UpdateCategoryResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -54,6 +57,7 @@ namespace Eshop.WebApi.Features.Categories
             return Ok(result);
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpDelete("{id}", Name = nameof(DeleteCategory))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]

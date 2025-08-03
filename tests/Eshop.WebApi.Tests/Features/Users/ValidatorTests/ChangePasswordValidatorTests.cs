@@ -16,9 +16,20 @@ namespace Eshop.WebApi.Tests.Features.Users.ValidatorTests
         [TestCase(null)]
         [TestCase("")]
         [TestCase(" ")]
-        public void ChangePasswordUser_NewPasswordNotNullOrEmpty(string? newpassword)
+        public void ChangePasswordUser_CurrentPasswordNotNullOrEmpty(string? currentPassword)
         {
-            var request = new ChangePasswordRequestDto { CurrentPassword = "Valid!Password123", NewPassword = newpassword! };
+            var request = new ChangePasswordRequestDto { CurrentPassword = currentPassword, NewPassword = "Valid!Password123" };
+            var command = new ChangePassword.Command(request);
+            var result = validator.TestValidate(command);
+            result.ShouldHaveValidationErrorFor(x => x.Request.CurrentPassword);
+        }
+
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase(" ")]
+        public void ChangePasswordUser_NewPasswordNotNullOrEmpty(string? newPassword)
+        {
+            var request = new ChangePasswordRequestDto { CurrentPassword = "Valid!Password123", NewPassword = newPassword! };
             var command = new ChangePassword.Command(request);
             var result = validator.TestValidate(command);
             result.ShouldHaveValidationErrorFor(x => x.Request.NewPassword);

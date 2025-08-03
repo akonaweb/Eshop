@@ -2,7 +2,6 @@ using Eshop.Infrastructure;
 using Eshop.Persistence;
 using Eshop.WebApi.Exceptions;
 using Eshop.WebApi.Infrastructure;
-using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -12,14 +11,6 @@ namespace Eshop.WebApi.Features.Users
     public class RefreshTokens
     {
         public record Command(string RefreshToken) : IRequest<RefreshTokensResponseDto>;
-
-        public class Validator : AbstractValidator<Command>
-        {
-            public Validator()
-            {
-                RuleFor(x => x.RefreshToken).NotEmpty();
-            }
-        }
 
         public class Handler : IRequestHandler<Command, RefreshTokensResponseDto>
         {

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { CartItem, useCartContext } from "./providers/CartProvider";
+import AdminActions from "./AdminActions";
 
 const ToolbarActions = () => {
   const router = useRouter();
@@ -19,15 +20,19 @@ const ToolbarActions = () => {
   if (!items) return null;
 
   return (
-    <Button
-      onClick={() => {
-        router.push("/cart");
-      }}
-    >
-      <Badge badgeContent={items.length} color="primary">
-        <ShoppingCart color="action" />
-      </Badge>
-    </Button>
+    <>
+      <Button
+        onClick={() => {
+          router.push("/cart");
+        }}
+      >
+        <Badge badgeContent={items.length} color="primary">
+          <ShoppingCart color="action" />
+        </Badge>
+      </Button>
+
+      <AdminActions />
+    </>
   );
 };
 export default ToolbarActions;
