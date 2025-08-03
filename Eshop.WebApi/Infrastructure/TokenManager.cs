@@ -51,7 +51,7 @@ namespace Eshop.WebApi.Infrastructure
                 issuer: authConfiguration.Issuer,
                 audience: authConfiguration.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(30) // NOTE: we should use DateTimeProvider
+                expires: dateTimeProvider.Now.AddMinutes(30)
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);

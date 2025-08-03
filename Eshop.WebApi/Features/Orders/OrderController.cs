@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.CodeAnalysis;
 
@@ -17,6 +18,7 @@ namespace Eshop.WebApi.Features.Orders
             this.mediator = mediator;
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpGet(Name = nameof(GetOrders))]
         [ProducesResponseType(typeof(IEnumerable<GetOrdersResponseDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<GetOrdersResponseDto>>> GetOrders()
@@ -25,6 +27,7 @@ namespace Eshop.WebApi.Features.Orders
             return Ok(result);
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpGet("{id}", Name = nameof(GetOrder))]
         [ProducesResponseType(typeof(GetOrderResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -54,6 +57,7 @@ namespace Eshop.WebApi.Features.Orders
             return CreatedAtAction(nameof(GetOrder), new { id = result.Id }, result);
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpDelete("{id}", Name = nameof(DeleteOrder))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -64,6 +68,7 @@ namespace Eshop.WebApi.Features.Orders
             return NoContent();
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpPut("{id}", Name = nameof(UpdateOrder))]
         [ProducesResponseType(typeof(UpdateOrderResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]

@@ -102,7 +102,7 @@ static void SetupCors(WebApplicationBuilder builder, string corsPolicy)
     {
         options.AddPolicy(corsPolicy, config =>
         {
-            config.WithOrigins(builder.Configuration["Client:Url"]!).AllowAnyHeader().AllowAnyMethod();
+            config.WithOrigins(builder.Configuration["Client:Url"]!).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
         });
     });
 }

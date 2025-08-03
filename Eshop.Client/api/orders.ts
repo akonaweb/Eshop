@@ -1,4 +1,7 @@
 import { CartItem } from "@/components/providers/CartProvider";
+import api from "./api";
+import urls from "./urls";
+import { getClientAccessToken } from "./accessToken";
 
 export type Cart = {
   items: CartFullItem[];
@@ -14,18 +17,11 @@ export type CartFullItem = {
 };
 
 export const getCart = async (items: CartItem[]): Promise<Cart> => {
-  const result = await (
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Order/cart`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(items),
-    })
-  ).json();
-
-  return result;
+  const resonse = await api(getClientAccessToken()).post(
+    urls.order.cart,
+    items
+  );
+  return resonse.data;
 };
 
 export type Customer = {
@@ -42,16 +38,20 @@ export const addOrder = async (
     address: customer.address,
   };
 
-  const result = await (
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Order`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    })
-  ).json();
+  const resonse = await api(getClientAccessToken()).post(
+    urls.order.addOrder,
+    payload
+  );
+  return resonse.data;
+};
 
-  return result;
+export type Order = {
+  id: number;
+  customer: string;
+  address: string;
+  createdAt: Date;
+};
+export const getOrders = async (token: string | null): Promise<Order[]> => {
+  const resonse = await api(token).get(urls.order.list);
+  return resonse.data;
 };

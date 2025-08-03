@@ -14,6 +14,7 @@ namespace Eshop.WebApi.Features.Users
         {
             public Validator()
             {
+                RuleFor(x => x.Request.CurrentPassword).NotEmpty();
                 RuleFor(x => x.Request.NewPassword).NotEmpty();
             }
         }
