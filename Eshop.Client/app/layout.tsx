@@ -5,6 +5,7 @@ import * as React from "react";
 
 import { getCategories } from "@/api/categories";
 import { AuthProvider } from "@/components/providers/AuthProvider";
+import QueryProvider from "@/components/providers/QueryProvider";
 
 export default async function Layout(props: { children: React.ReactNode }) {
   const categories = await getCategories();
@@ -20,9 +21,11 @@ export default async function Layout(props: { children: React.ReactNode }) {
       <body>
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <React.Suspense fallback={<LinearProgress />}>
-            <AuthProvider navigation={navigation}>
-              {props.children}
-            </AuthProvider>
+            <QueryProvider>
+              <AuthProvider navigation={navigation}>
+                {props.children}
+              </AuthProvider>
+            </QueryProvider>
           </React.Suspense>
         </AppRouterCacheProvider>
       </body>

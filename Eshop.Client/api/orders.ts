@@ -1,12 +1,6 @@
-import { CartItem } from "@/components/providers/CartProvider";
-import api from "./api";
-import urls from "./urls";
-import { getClientAccessToken } from "./accessToken";
-
-export type Cart = {
-  items: CartFullItem[];
-  totalPrice: number;
-};
+import api, { getAccessToken } from "./core/api";
+import urls from "./core/urls";
+import useApiQuery from "./core/useApiQuery";
 
 export type CartFullItem = {
   productId: number;
@@ -15,14 +9,23 @@ export type CartFullItem = {
   quantity: number;
   totalPrice: number;
 };
-
-export const getCart = async (items: CartItem[]): Promise<Cart> => {
-  const resonse = await api(getClientAccessToken()).post(
-    urls.order.cart,
-    items
-  );
-  return resonse.data;
+export type Cart = {
+  items: CartFullItem[];
+  totalPrice: number;
 };
+export type CartItem = {
+  productId: number;
+  quantity: number;
+};
+export const getCart = async (items: CartItem[]): Promise<Cart> => {
+  const response = await api(getAccessToken()).post(urls.order.cart, items);
+  return response.data;
+};
+export function useCartQuery(items: CartItem[]) {
+  return useApiQuery(["cart", JSON.stringify(items)], () => getCart(items), {
+    enabled: items.length > 0,
+  });
+}
 
 export type Customer = {
   name: string;
@@ -38,11 +41,11 @@ export const addOrder = async (
     address: customer.address,
   };
 
-  const resonse = await api(getClientAccessToken()).post(
+  const response = await api(getAccessToken()).post(
     urls.order.addOrder,
     payload
   );
-  return resonse.data;
+  return response.data;
 };
 
 export type Order = {
@@ -51,7 +54,9 @@ export type Order = {
   address: string;
   createdAt: Date;
 };
-export const getOrders = async (token: string | null): Promise<Order[]> => {
-  const resonse = await api(token).get(urls.order.list);
-  return resonse.data;
+export const getOrders = async (
+  ssrAccessToken: string | null
+): Promise<Order[]> => {
+  const response = await api(ssrAccessToken).get(urls.order.list);
+  return response.data;
 };

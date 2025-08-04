@@ -10,12 +10,10 @@ import {
   useState,
 } from "react";
 
+import { CartItem } from "@/api/orders";
+
 const localStorageKey = "eshop-cart";
 
-export type CartItem = {
-  productId: number;
-  quantity: number;
-};
 type CartContextType = {
   items: CartItem[];
   onProductAdd: (item: CartItem) => void;

@@ -1,6 +1,5 @@
-import { getClientAccessToken } from "./accessToken";
-import api from "./api";
-import urls from "./urls";
+import api from "./core/api";
+import urls from "./core/urls";
 
 export type Category = {
   id: number;
@@ -8,6 +7,6 @@ export type Category = {
 };
 
 export const getCategories = async (): Promise<Category[]> => {
-  const resonse = await api(getClientAccessToken()).get(urls.category.list);
-  return resonse.data;
+  const response = await api().get(urls.category.list);
+  return response.data;
 };

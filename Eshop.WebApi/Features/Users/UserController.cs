@@ -15,6 +15,9 @@ namespace Eshop.WebApi.Features.Users
         private readonly IMediator mediator;
         private readonly IDateTimeProvider dateTimeProvider;
 
+        private const string ACCESS_TOKEN_KEY = "accessToken";
+        private const string REFRESH_TOKEN_KEY = "refreshToken";
+
         public UserController(IMediator mediator, IDateTimeProvider dateTimeProvider)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
@@ -54,8 +57,8 @@ namespace Eshop.WebApi.Features.Users
         [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
         public ActionResult Logout()
         {
-            Response.Cookies.Delete("accessToken");
-            Response.Cookies.Delete("refreshToken");
+            Response.Cookies.Delete(ACCESS_TOKEN_KEY);
+            Response.Cookies.Delete(REFRESH_TOKEN_KEY);
 
             return NoContent();
         }
@@ -66,7 +69,7 @@ namespace Eshop.WebApi.Features.Users
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<RefreshTokensResponseDto>> RefreshTokens()
         {
-            var refreshToken = Request.Cookies["refreshToken"] ?? string.Empty;
+            var refreshToken = Request.Cookies[REFRESH_TOKEN_KEY] ?? string.Empty;
             var result = await mediator.Send(new RefreshTokens.Command(refreshToken));
 
             var cookies = new CookiesDto
@@ -113,7 +116,7 @@ namespace Eshop.WebApi.Features.Users
 
         private void SetCookies(CookiesDto dto)
         {
-            Response.Cookies.Append("accessToken", dto.AccessToken, new CookieOptions
+            Response.Cookies.Append(ACCESS_TOKEN_KEY, dto.AccessToken, new CookieOptions
             {
                 HttpOnly = false, // Needed for JavaScript
                 Secure = true,
@@ -121,7 +124,7 @@ namespace Eshop.WebApi.Features.Users
                 Expires = dto.AccessTokenExpirationDate, // NOTE: coming from TokenManager
             });
 
-            Response.Cookies.Append("refreshToken", dto.RefreshToken, new CookieOptions
+            Response.Cookies.Append(REFRESH_TOKEN_KEY, dto.RefreshToken, new CookieOptions
             {
                 HttpOnly = true, // It will be not needed on FE
                 Secure = true,
