@@ -1,7 +1,6 @@
-import { getClientAccessToken } from "./accessToken";
-import api from "./api";
+import api from "./core/api";
 import { Category } from "./categories";
-import urls from "./urls";
+import urls from "./core/urls";
 
 export type Product = {
   id: number;
@@ -13,10 +12,8 @@ export type Product = {
 };
 
 export const getProducts = async (categoryId: number): Promise<Product[]> => {
-  const resonse = await api(getClientAccessToken()).get<Product[]>(
-    urls.product.list
-  );
-  return resonse.data
+  const response = await api().get<Product[]>(urls.product.list);
+  return response.data
     .filter((x) => x.category.id === categoryId)
     .map((x) => ({ ...x, image: "https://picsum.photos/300" }));
 };

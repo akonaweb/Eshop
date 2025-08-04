@@ -1,6 +1,24 @@
 import axios from "axios";
-import { redirect } from "next/navigation";
 import urls from "./urls";
+import { redirect } from "next/navigation";
+
+export const accessTokenKey = "accessToken";
+export const refreshTokenKey = "refreshToken";
+export const getAccessToken = () => localStorage.getItem(accessTokenKey);
+export const setAccessToken = (value: string) =>
+  localStorage.setItem(accessTokenKey, value);
+export const removeAccessToken = () => {
+  localStorage.removeItem(accessTokenKey);
+  document.cookie = `${accessTokenKey}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=None; Secure`;
+  document.cookie = `${refreshTokenKey}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=None; Secure`;
+};
+
+export type ProblemDetails = {
+  title: string;
+  status: number;
+  detail?: string;
+  errors?: Record<string, string[]>;
+};
 
 const api = (accessToken?: string | null) => {
   const instance = axios.create({
@@ -24,17 +42,19 @@ const api = (accessToken?: string | null) => {
         !originalRequest.url.includes(urls.user.refreshTokens)
       ) {
         originalRequest._retry = true;
+
         try {
           const response = await axios.get(
             `${process.env.NEXT_PUBLIC_API_URL}/${urls.user.refreshTokens}`,
             { withCredentials: true }
           );
 
-          localStorage.setItem("accessToken", response.data.accessToken);
-          originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
+          const refreshedAccessToken = response.data[accessTokenKey];
+          setAccessToken(refreshedAccessToken);
+          originalRequest.headers.Authorization = `Bearer ${refreshedAccessToken}`;
           return instance(originalRequest);
         } catch (refreshErr) {
-          console.error("Refresh token failed", refreshErr);
+          console.warn("Refresh token failed", refreshErr);
           redirect("/login");
         }
       }
@@ -44,7 +64,7 @@ const api = (accessToken?: string | null) => {
         redirect("/forbidden");
       }
 
-      return Promise.reject(error);
+      throw error.response?.data as ProblemDetails;
     }
   );
 

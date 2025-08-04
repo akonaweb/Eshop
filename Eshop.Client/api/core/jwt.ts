@@ -2,12 +2,6 @@ export type Session = {
   user: { email: string; name: string };
 };
 
-export const getClientAccessToken = (): string | null => {
-  if (typeof window === "undefined") return null;
-  const match = document.cookie.match(/(?:^|; )accessToken=([^;]*)/);
-  return match ? decodeURIComponent(match[1]) : null;
-};
-
 export const parseJwt = (token: string | null): Session | null => {
   if (!token) return null;
 

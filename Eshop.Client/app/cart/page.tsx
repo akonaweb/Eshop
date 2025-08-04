@@ -9,31 +9,18 @@ import {
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 
-import { addOrder, Cart, Customer, getCart } from "@/api/orders";
+import { addOrder, Cart, Customer, getCart, useCartQuery } from "@/api/orders";
 import { useCartContext } from "@/components/providers/CartProvider";
 import CustomerInfo from "./CustomerInfo";
 import ProductsTable from "./ProductsTable";
+import Data from "@/components/Data";
 
 const defaultCustomer: Customer = { name: "", address: "" };
 
 const CartPage = () => {
   const { items, onCartEmpty } = useCartContext();
-  const [cart, setCart] = useState<Cart>();
+  const response = useCartQuery(items);
   const [customer, setCustomer] = useState(defaultCustomer);
-
-  useEffect(() => {
-    const fetch = async () => {
-      if (!items.length) {
-        setCart({ items: [], totalPrice: 0 });
-        return;
-      }
-      const result = await getCart(items);
-      setCart(result);
-    };
-
-    if (!items) return;
-    fetch();
-  }, [items]);
 
   const handleBuy = useCallback(async () => {
     if (!customer.name || !customer.address) {
@@ -51,40 +38,45 @@ const CartPage = () => {
     onCartEmpty();
   }, [items, customer, onCartEmpty]);
 
-  if (!cart)
-    return (
-      <Backdrop open>
-        <CircularProgress color="inherit" />
-      </Backdrop>
-    );
-
   return (
     <Box sx={{ p: 3, width: "100%", maxWidth: 1200, mx: "auto" }}>
       <Typography variant="h5" gutterBottom>
         🛒 Cart Items
       </Typography>
 
-      <ProductsTable cart={cart} />
+      <Data response={response}>
+        {(cart) => {
+          if (!cart) return <div>No items</div>;
+          return (
+            <>
+              <ProductsTable cart={cart} />
 
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                }}
+              >
+                <CustomerInfo
+                  customer={customer}
+                  onCustomerChange={setCustomer}
+                />
+
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleBuy}
+                  sx={{ height: 40 }}
+                  disabled={!cart.items.length}
+                >
+                  Buy
+                </Button>
+              </Box>
+            </>
+          );
         }}
-      >
-        <CustomerInfo customer={customer} onCustomerChange={setCustomer} />
-
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleBuy}
-          sx={{ height: 40 }}
-          disabled={!cart.items.length}
-        >
-          Buy
-        </Button>
-      </Box>
+      </Data>
     </Box>
   );
 };

@@ -4,35 +4,40 @@ import { CircularProgress } from "@mui/material";
 import { SignInPage, type AuthProvider } from "@toolpad/core/SignInPage";
 import { useEffect, useState } from "react";
 
-import { login } from "@/api/users";
+import { getAccessToken } from "@/api/core/api";
+import { login, logout } from "@/api/users";
 
 const providers = [{ id: "credentials", name: "Email and Password" }];
-
-const signIn: (provider: AuthProvider, formData: FormData) => void = async (
-  _,
-  formData
-) => {
-  const promise = new Promise<void>(async (resolve) => {
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
-    try {
-      await login(email, password);
-      window.location.href = "/";
-    } catch {
-      resolve({ error: "Login failed!" } as any);
-    }
-  });
-
-  return promise;
-};
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(true);
 
+  const signIn: (provider: AuthProvider, formData: FormData) => void = async (
+    _,
+    formData
+  ) => {
+    const promise = new Promise<void>(async (resolve) => {
+      const email = formData.get("email") as string;
+      const password = formData.get("password") as string;
+
+      try {
+        await login(email, password);
+        window.location.href = "/";
+      } catch {
+        try {
+          await logout();
+        } catch {
+          console.error("Something went wrong!");
+        }
+        resolve({ error: "Login failed!" } as any);
+      }
+    });
+
+    return promise;
+  };
+
   useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) window.location.href = "/";
+    if (getAccessToken()) window.location.href = "/";
     else setIsLoading(false);
   }, []);
 
