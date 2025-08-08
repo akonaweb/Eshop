@@ -13,11 +13,11 @@ namespace Eshop.WebApi.Infrastructure
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public Guid GetUserId()
+        public Guid? GetUserId()
         {
             var userId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
-                throw new UnauthorizedAccessException("User is not authenticated.");
+                return null;
 
             return Guid.Parse(userId);
         }

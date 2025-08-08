@@ -1,19 +1,14 @@
 "use client";
 
-import {
-  Backdrop,
-  Box,
-  Button,
-  CircularProgress,
-  Typography,
-} from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { Box, Button, Typography } from "@mui/material";
+import { useCallback, useState } from "react";
 
-import { addOrder, Cart, Customer, getCart, useCartQuery } from "@/api/orders";
+import useApiMutation from "@/api/core/useApiMutation";
+import { addOrder, Customer, useCartQuery } from "@/api/orders";
+import Data from "@/components/Data";
 import { useCartContext } from "@/components/providers/CartProvider";
 import CustomerInfo from "./CustomerInfo";
 import ProductsTable from "./ProductsTable";
-import Data from "@/components/Data";
 
 const defaultCustomer: Customer = { name: "", address: "" };
 
@@ -21,22 +16,26 @@ const CartPage = () => {
   const { items, onCartEmpty } = useCartContext();
   const response = useCartQuery(items);
   const [customer, setCustomer] = useState(defaultCustomer);
+  const orderMutation = useApiMutation(addOrder, {
+    onSuccess: (data) => {
+      alert("Order placed successfully!");
+      setCustomer(defaultCustomer);
+      onCartEmpty();
+    },
+    onError: (error) => {
+      // TODO: consume error - either 400 validation or 500 - probably modal
+      console.info(error);
+    },
+  });
 
-  const handleBuy = useCallback(async () => {
+  const handleBuy = useCallback(() => {
     if (!customer.name || !customer.address) {
       alert("Name & Address are required!");
       return;
     }
 
-    await addOrder(items, customer);
-
-    alert(
-      `Order for customer: ${customer.name} will be delivered to the address: ${customer.address}`
-    );
-
-    setCustomer(defaultCustomer);
-    onCartEmpty();
-  }, [items, customer, onCartEmpty]);
+    orderMutation.mutate({ items, customer });
+  }, [items, customer, orderMutation]);
 
   return (
     <Box sx={{ p: 3, width: "100%", maxWidth: 1200, mx: "auto" }}>

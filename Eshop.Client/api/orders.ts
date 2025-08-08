@@ -1,4 +1,5 @@
-import api, { getAccessToken } from "./core/api";
+import api from "./core/api";
+import apiSsr from "./core/apiSsr";
 import urls from "./core/urls";
 import useApiQuery from "./core/useApiQuery";
 
@@ -18,7 +19,7 @@ export type CartItem = {
   quantity: number;
 };
 export const getCart = async (items: CartItem[]): Promise<Cart> => {
-  const response = await api(getAccessToken()).post(urls.order.cart, items);
+  const response = await api.post(urls.order.cart, items);
   return response.data;
 };
 export function useCartQuery(items: CartItem[]) {
@@ -31,20 +32,34 @@ export type Customer = {
   name: string;
   address: string;
 };
-export const addOrder = async (
-  items: CartItem[],
-  customer: Customer
-): Promise<Cart> => {
+type AddOrderItemResonse = {
+  productId: number;
+  productTitle: string;
+  quantity: number;
+  price: number;
+  totalPrice: number;
+};
+type AddOrderResonse = {
+  id: number;
+  customer: string;
+  address: string;
+  items: AddOrderItemResonse[];
+  totalPrice: number;
+};
+export const addOrder = async ({
+  items,
+  customer,
+}: {
+  items: CartItem[];
+  customer: Customer;
+}): Promise<AddOrderResonse> => {
   const payload = {
     items,
     customer: customer.name,
     address: customer.address,
   };
 
-  const response = await api(getAccessToken()).post(
-    urls.order.addOrder,
-    payload
-  );
+  const response = await api.post(urls.order.addOrder, payload);
   return response.data;
 };
 
@@ -55,8 +70,9 @@ export type Order = {
   createdAt: Date;
 };
 export const getOrders = async (
-  ssrAccessToken: string | null
+  accessToken: string,
+  backUrl: string
 ): Promise<Order[]> => {
-  const response = await api(ssrAccessToken).get(urls.order.list);
+  const response = await apiSsr(accessToken, backUrl).get(urls.order.list);
   return response.data;
 };

@@ -27,6 +27,7 @@ var app = builder.Build();
 CreateDbIfNotExists(app);
 await SetupEnvironment(app, corsPolicy);
 app.UseHttpsRedirection();
+app.UseMiddleware<JwtCookieToHeaderMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

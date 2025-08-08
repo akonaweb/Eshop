@@ -2,44 +2,67 @@
 
 import { CircularProgress } from "@mui/material";
 import { SignInPage, type AuthProvider } from "@toolpad/core/SignInPage";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import { getAccessToken } from "@/api/core/api";
-import { login, logout } from "@/api/users";
+import { login, logout, refreshTokens } from "@/api/users";
+import { useUserContext } from "@/components/providers/AuthProvider";
+import { useSearchParams } from "next/navigation";
 
 const providers = [{ id: "credentials", name: "Email and Password" }];
+const signIn: (provider: AuthProvider, formData: FormData) => void = async (
+  _,
+  formData
+) => {
+  const promise = new Promise<void>(async (resolve) => {
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    try {
+      await login(email, password);
+      window.location.href = "/";
+    } catch {
+      try {
+        await logout();
+      } catch {
+        console.error("Something went wrong!");
+      }
+      resolve({ error: "Login failed!" } as any);
+    }
+  });
+
+  return promise;
+};
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(true);
-
-  const signIn: (provider: AuthProvider, formData: FormData) => void = async (
-    _,
-    formData
-  ) => {
-    const promise = new Promise<void>(async (resolve) => {
-      const email = formData.get("email") as string;
-      const password = formData.get("password") as string;
-
-      try {
-        await login(email, password);
-        window.location.href = "/";
-      } catch {
-        try {
-          await logout();
-        } catch {
-          console.error("Something went wrong!");
-        }
-        resolve({ error: "Login failed!" } as any);
-      }
-    });
-
-    return promise;
-  };
+  const { session } = useUserContext();
+  const searchParams = useSearchParams();
+  const backUrl = searchParams.get("back-url") ?? "";
 
   useEffect(() => {
-    if (getAccessToken()) window.location.href = "/";
-    else setIsLoading(false);
-  }, []);
+    const fetch = async () => {
+      try {
+        if (!backUrl) return;
+
+        console.info("Refresh tokens.");
+        const result = await refreshTokens();
+        console.log(result);
+        window.location.href = backUrl;
+        // todo redirect to back-url
+      } catch (err) {
+        window.location.href = "/login";
+        console.error("Token refresh failed.", err);
+      }
+    };
+
+    fetch();
+  }, [backUrl]);
+
+  useEffect(() => {
+    if (backUrl) return;
+    setIsLoading(false);
+    if (session) window.location.href = "/";
+  }, [backUrl, session]);
 
   if (isLoading) return <CircularProgress />;
 

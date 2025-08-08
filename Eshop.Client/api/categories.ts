@@ -7,6 +7,6 @@ export type Category = {
 };
 
 export const getCategories = async (): Promise<Category[]> => {
-  const response = await api().get(urls.category.list);
+  const response = await api.get(urls.category.list);
   return response.data;
 };

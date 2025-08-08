@@ -3,9 +3,9 @@ import { cookies } from "next/headers";
 import { getOrders } from "@/api/orders";
 
 export default async function AdminOrdersPage() {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("accessToken")?.value ?? null;
-  const orders = await getOrders(accessToken);
+  const cookieStore = cookies();
+  const accessToken = (await cookieStore).get("accessToken")?.value!;
+  const orders = await getOrders(accessToken, "/admin/orders");
 
   return (
     <>
