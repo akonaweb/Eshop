@@ -4,9 +4,8 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-tool
 
 ## Setup
 
-Add the `NEXT_PUBLIC_API_URL` and `NODE_TLS_REJECT_UNAUTHORIZED` to the .env.local file:
-NEXT_PUBLIC_API_URL=https://localhost:7203
-NODE_TLS_REJECT_UNAUTHORIZED=0
+Add the `NEXT_PUBLIC_API_URL` to the .env.local file:
+NEXT_PUBLIC_API_URL=http://localhost:7203
 
 ## Getting Started
 
@@ -14,7 +13,7 @@ NODE_TLS_REJECT_UNAUTHORIZED=0
 2. Run command to start dev server: `yarn dev`
 
 Open [http://localhost:3000] with your browser to see the result.
-You BE should be also running on port [https://localhost:7203/swagger]
+You BE should be also running on port [http://localhost:7203/swagger]
 
 ## Deploy on Vercel
 

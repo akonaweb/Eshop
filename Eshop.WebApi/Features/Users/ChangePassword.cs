@@ -34,7 +34,7 @@ namespace Eshop.WebApi.Features.Users
             {
                 var model = request.Request;
                 var userId = userContext.GetUserId();
-                var user = await userManager.FindByIdAsync(userId.ToString());
+                var user = await userManager.FindByIdAsync(userId.ToString()!);
 
                 if (user == null)
                     return Results.NotFound("User not found.");

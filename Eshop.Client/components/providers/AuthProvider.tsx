@@ -1,7 +1,7 @@
 "use client";
 
 import theme from "@/theme";
-import { Navigation } from "@toolpad/core";
+import { Navigation, Session } from "@toolpad/core";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import { PageContainer } from "@toolpad/core/PageContainer";
 import { NextAppProvider } from "@toolpad/core/nextjs";
@@ -14,9 +14,7 @@ import {
   useState,
 } from "react";
 
-import { parseJwt, Session } from "@/api/core/jwt";
-import { getAccessToken, removeAccessToken } from "@/api/core/api";
-import { logout, refreshTokens } from "@/api/users";
+import { getSession, logout, refreshTokens } from "@/api/users";
 import ToolbarActions from "@/components/ToolbarActions";
 import CartProvider from "@/components/providers/CartProvider";
 
@@ -40,7 +38,7 @@ export interface AppAuthProviderProps {
 const slots = { toolbarActions: ToolbarActions };
 
 export function AuthProvider({ children, navigation }: AppAuthProviderProps) {
-  const [session, setSession] = useState<Session | null>(null!);
+  const [session, setSession] = useState<Session | null>(null);
 
   const signIn = useCallback(() => (window.location.href = "/login"), []);
 
@@ -48,7 +46,6 @@ export function AuthProvider({ children, navigation }: AppAuthProviderProps) {
     try {
       await logout();
     } catch (err) {
-      removeAccessToken();
       console.error("Logout failed.", err);
     } finally {
       window.location.href = "/";
@@ -72,8 +69,18 @@ export function AuthProvider({ children, navigation }: AppAuthProviderProps) {
   );
 
   useEffect(() => {
-    setSession(parseJwt(getAccessToken()));
-  }, []);
+    const fetch = async () => {
+      try {
+        const data = await getSession();
+        setSession(data);
+      } catch {
+        setSession(null);
+      }
+    };
+
+    if (session) return;
+    fetch();
+  }, [session]);
 
   useEffect(() => {
     const interval = setInterval(
