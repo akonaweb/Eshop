@@ -11,7 +11,7 @@ Create `appsettings.Development.json` file with this content. This file is exclu
   },
   "Auth": {
     "SecretKey": "QJgILc4m267gH0lIxBpgXzfiByLx0wjMWcleR79nVXc=",
-    "Issuer": "https://localhost:7203",
+    "Issuer": "http://localhost:7203",
     "Audience": "Eshop"
   },
   "Client": {
