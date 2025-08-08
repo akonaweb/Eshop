@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.CodeAnalysis;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Eshop.WebApi.Features.Users
 {
@@ -16,16 +17,14 @@ namespace Eshop.WebApi.Features.Users
     public class UserController : ControllerBase
     {
         private readonly IMediator mediator;
-        private readonly IDateTimeProvider dateTimeProvider;
         private readonly IUserContext userContext;
         private readonly UserManager<ApplicationUser> userManager;
         private const string ACCESS_TOKEN_KEY = "accessToken";
         private const string REFRESH_TOKEN_KEY = "refreshToken";
 
-        public UserController(IMediator mediator, IDateTimeProvider dateTimeProvider, IUserContext userContext, UserManager<ApplicationUser> userManager)
+        public UserController(IMediator mediator, IUserContext userContext, UserManager<ApplicationUser> userManager)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-            this.dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
             this.userContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
             this.userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
@@ -43,16 +42,9 @@ namespace Eshop.WebApi.Features.Users
 
             var roles = await userManager.GetRolesAsync(user);
 
-            return Ok(new MeResponseDto { Id = user.Id, Email = user.Email!, Role = roles.FirstOrDefault()! });
+            var accessTokenExpirationDate = GetAccessTokenExpirationDate();
+            return Ok(new MeResponseDto { Id = user.Id, Email = user.Email!, Role = roles.FirstOrDefault()!, AccessTokenExpirationDate = accessTokenExpirationDate });
         }
-
-        public class MeResponseDto
-        {
-            public required string Id { get; set; }
-            public required string Email { get; set; }
-            public required string Role { get; set; }
-        }
-
 
         [HttpPost("register")]
         [ProducesResponseType(typeof(RegisterUserResponseDto), StatusCodes.Status200OK)]
@@ -64,7 +56,7 @@ namespace Eshop.WebApi.Features.Users
         }
 
         [HttpPost("login")]
-        [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OkResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<LoginResponseDto>> Login(LoginRequestDto request)
@@ -73,18 +65,18 @@ namespace Eshop.WebApi.Features.Users
             var cookies = new CookiesDto
             {
                 AccessToken = result.AccessToken,
+                AccessTokenExpirationDate = result.AccessTokenExpirationDate,
                 RefreshToken = result.RefreshToken,
-                AccessTokenExpirationDate = dateTimeProvider.Now.AddMinutes(30),
-                RefreshTokenExpirationDate = dateTimeProvider.Now.AddDays(7)
+                RefreshTokenExpirationDate = result.RefreshTokenExpirationDate
             };
 
             SetCookies(cookies);
 
-            return Ok(result);
+            return Ok();
         }
 
         [HttpPost("logout")]
-        [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(NoContentResult), StatusCodes.Status204NoContent)]
         public ActionResult Logout()
         {
             Response.Cookies.Delete(ACCESS_TOKEN_KEY);
@@ -94,7 +86,7 @@ namespace Eshop.WebApi.Features.Users
         }
 
         [HttpGet("refresh-tokens")]
-        [ProducesResponseType(typeof(RefreshTokensResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OkResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<RefreshTokensResponseDto>> RefreshTokens()
@@ -105,14 +97,14 @@ namespace Eshop.WebApi.Features.Users
             var cookies = new CookiesDto
             {
                 AccessToken = result.AccessToken,
+                AccessTokenExpirationDate = result.AccessTokenExpirationDate,
                 RefreshToken = result.RefreshToken,
-                AccessTokenExpirationDate = dateTimeProvider.Now.AddMinutes(30),
-                RefreshTokenExpirationDate = dateTimeProvider.Now.AddDays(7)
+                RefreshTokenExpirationDate = result.RefreshTokenExpirationDate
             };
 
             SetCookies(cookies);
 
-            return Ok(result);
+            return Ok();
         }
 
         [Authorize]
@@ -148,7 +140,7 @@ namespace Eshop.WebApi.Features.Users
         {
             Response.Cookies.Append(ACCESS_TOKEN_KEY, dto.AccessToken, new CookieOptions
             {
-                HttpOnly = true,
+                HttpOnly = true, // // Note: also on FE SSR
                 Secure = false,
                 SameSite = SameSiteMode.Lax,
                 Expires = dto.AccessTokenExpirationDate,
@@ -156,14 +148,33 @@ namespace Eshop.WebApi.Features.Users
 
             Response.Cookies.Append(REFRESH_TOKEN_KEY, dto.RefreshToken, new CookieOptions
             {
-                HttpOnly = true,
+                HttpOnly = false, // Note: needed only on BE
                 Secure = false,
                 SameSite = SameSiteMode.Lax,
                 Expires = dto.RefreshTokenExpirationDate,
             });
         }
+        public class MeResponseDto
+        {
+            public required string Id { get; set; }
+            public required string Email { get; set; }
+            public required string Role { get; set; }
+            public DateTime AccessTokenExpirationDate { get; set; }
+        }
 
-        internal class CookiesDto
+        private DateTime GetAccessTokenExpirationDate()
+        {
+            Request.Cookies.TryGetValue("accessToken", out var token);
+
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+            var expUnix = long.Parse(jwtToken.Claims.First(c => c.Type == "exp").Value);
+            var expirationDate = DateTimeOffset.FromUnixTimeSeconds(expUnix).UtcDateTime;
+
+            return expirationDate;
+        }
+
+        private class CookiesDto
         {
             public required string AccessToken { get; set; }
             public required string RefreshToken { get; set; }

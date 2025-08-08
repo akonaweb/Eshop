@@ -50,7 +50,9 @@ namespace Eshop.WebApi.Features.Users
                 return new LoginResponseDto
                 {
                     AccessToken = tokens.AccessToken,
-                    RefreshToken = tokens.RefreshToken
+                    AccessTokenExpirationDate = tokens.AccessTokenExpirationDate,
+                    RefreshToken = tokens.RefreshToken,
+                    RefreshTokenExpirationDate = tokens.RefreshTokenExpirationDate
                 };
             }
         }
@@ -65,6 +67,8 @@ namespace Eshop.WebApi.Features.Users
     public class LoginResponseDto
     {
         public required string AccessToken { get; set; }
+        public DateTime AccessTokenExpirationDate { get; set; }
         public required string RefreshToken { get; set; }
+        public DateTime RefreshTokenExpirationDate { get; set; }
     }
 }

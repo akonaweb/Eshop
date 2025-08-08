@@ -23,7 +23,7 @@ namespace Eshop.WebApi.Tests.Features.Users
 
             userManagerMock.Setup(x => x.Users).Returns(dbContext.Users);
             userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(user);
-            tokenManagerMock.Setup(x => x.GetTokens(user)).ReturnsAsync(new TokensResponse("access-token", "refresh-token"));
+            tokenManagerMock.Setup(x => x.GetTokens(user)).ReturnsAsync(new TokensResponse("access-token", DateTimeMocks.Now.AddMinutes(30), "refresh-token", DateTimeMocks.Now.AddDays(7)));
 
             var command = new RefreshTokens.Command(refreshToken);
             var handler = new RefreshTokens.Handler(tokenManagerMock.Object, dateTimeProviderMock.Object, userManagerMock.Object);
@@ -45,7 +45,7 @@ namespace Eshop.WebApi.Tests.Features.Users
             
             userManagerMock.Setup(x => x.Users).Returns(dbContext.Users);
             userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(user);
-            tokenManagerMock.Setup(x => x.GetTokens(user)).ReturnsAsync(new TokensResponse("access-token", "refresh-token"));
+            tokenManagerMock.Setup(x => x.GetTokens(user)).ReturnsAsync(new TokensResponse("access-token", DateTimeMocks.Now.AddMinutes(30), "refresh-token", DateTimeMocks.Now.AddDays(7)));
 
             var command = new RefreshTokens.Command(refreshToken);
             var handler = new RefreshTokens.Handler(tokenManagerMock.Object, dateTimeProviderMock.Object, userManagerMock.Object);
@@ -67,7 +67,7 @@ namespace Eshop.WebApi.Tests.Features.Users
 
             userManagerMock.Setup(x => x.Users).Returns(dbContext.Users);
             userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(user);
-            tokenManagerMock.Setup(x => x.GetTokens(user)).ReturnsAsync(new TokensResponse("access-token", "refresh-token"));
+            tokenManagerMock.Setup(x => x.GetTokens(user)).ReturnsAsync(new TokensResponse("access-token", DateTimeMocks.Now.AddMinutes(30), "refresh-token", DateTimeMocks.Now.AddDays(7)));
 
             var command = new RefreshTokens.Command(refreshToken);
             var handler = new RefreshTokens.Handler(tokenManagerMock.Object, dateTimeProviderMock.Object, userManagerMock.Object);

@@ -1,4 +1,5 @@
 ﻿using Eshop.Persistence;
+using Eshop.Shared.Tests.Mocks;
 using Eshop.WebApi.Exceptions;
 using Eshop.WebApi.Features.Users;
 using Microsoft.AspNetCore.Identity;
@@ -20,7 +21,7 @@ namespace Eshop.WebApi.Tests.Features.Users
 
             userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(user);
             signInManagerMock.Setup(sm => sm.PasswordSignInAsync(user, password, false, false)).ReturnsAsync(SignInResult.Success);
-            tokenManagerMock.Setup(x => x.GetTokens(user)).ReturnsAsync(new TokensResponse("access-token", "refresh-token"));
+            tokenManagerMock.Setup(x => x.GetTokens(user)).ReturnsAsync(new TokensResponse("access-token", DateTimeMocks.Now.AddMinutes(30), "refresh-token", DateTimeMocks.Now.AddDays(7)));
 
             var request = new LoginRequestDto { Email = email, Password = password };
             var command = new LoginUser.Command(request);

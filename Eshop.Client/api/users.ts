@@ -3,7 +3,10 @@ import { Session } from "@toolpad/core";
 import api from "./core/api";
 import urls from "./core/urls";
 
-export async function getSession(): Promise<Session | null> {
+export type ExtendedSession = Session & {
+  accessTokenExpirationDate: Date;
+};
+export async function getSession(): Promise<ExtendedSession | null> {
   const { data } = await api.get("/user/me");
   return data
     ? {
@@ -12,6 +15,7 @@ export async function getSession(): Promise<Session | null> {
           email: data.email,
           name: data.role,
         },
+        accessTokenExpirationDate: data.accessTokenExpirationDate,
       }
     : null;
 }
