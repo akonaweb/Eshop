@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 
 namespace Eshop.WebApi.Infrastructure
 {
-    [ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage] // TODO - create unit tests
     public class TokenManager : ITokenManager
     {
         private readonly UserManager<ApplicationUser> userManager;
@@ -24,16 +24,41 @@ namespace Eshop.WebApi.Infrastructure
 
         public async Task<TokensResponse> GetTokens(ApplicationUser user)
         {
-            var accessToken = await GenerateAccessToken(user);
-            var refreshToken = GenerateRefreshToken();
-            user.UpdateRefreshToken(refreshToken, dateTimeProvider.Now.AddDays(7));
+            var (accessToken, accessTokenExpirationDate) = await GenerateAccessToken(user);
+            var (refreshToken, refreshTokenExpirationDate) = GenerateRefreshToken();
+
+            user.UpdateRefreshToken(refreshToken, refreshTokenExpirationDate);
             await userManager.UpdateAsync(user);
 
-            return new TokensResponse(accessToken, refreshToken);
+            return new TokensResponse(accessToken, accessTokenExpirationDate, refreshToken, refreshTokenExpirationDate);
         }
 
-        private async Task<string> GenerateAccessToken(ApplicationUser user)
+        public class TokensResponse
         {
+            public TokensResponse(string accessToken, DateTime accessTokenExpirationDate, string refreshToken, DateTime refreshTokenExpirationDate)
+            {
+                if (string.IsNullOrWhiteSpace(accessToken))
+                    throw new ArgumentNullException(nameof(accessToken));
+
+                if (string.IsNullOrWhiteSpace(refreshToken))
+                    throw new ArgumentNullException(nameof(refreshToken));
+
+                AccessToken = accessToken;
+                AccessTokenExpirationDate = accessTokenExpirationDate;
+                RefreshToken = refreshToken;
+                RefreshTokenExpirationDate = refreshTokenExpirationDate;
+            }
+
+            public string AccessToken { get; }
+            public DateTime AccessTokenExpirationDate { get; }
+            public string RefreshToken { get; }
+            public DateTime RefreshTokenExpirationDate { get; }
+        }
+
+        private async Task<(string AccessToken, DateTime ExpirationDate)> GenerateAccessToken(ApplicationUser user)
+        {
+            var expirationDate = dateTimeProvider.Now.AddMinutes(30);
+
             var claims = new List<Claim>
             {
                 new(JwtRegisteredClaimNames.Sub, user.Id),
@@ -51,36 +76,21 @@ namespace Eshop.WebApi.Infrastructure
                 issuer: authConfiguration.Issuer,
                 audience: authConfiguration.Audience,
                 claims: claims,
-                expires: dateTimeProvider.Now.AddMinutes(30)
+                expires: expirationDate
             );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return (new JwtSecurityTokenHandler().WriteToken(token), expirationDate);
         }
 
-        private string GenerateRefreshToken()
+        private (string RefreshToken, DateTime RefreshTokenExpirationDate) GenerateRefreshToken()
         {
+            var expirationDate = dateTimeProvider.Now.AddDays(7);
+
             var randomNumber = new byte[32];
             using var randomNumberGenerator = RandomNumberGenerator.Create();
             randomNumberGenerator.GetBytes(randomNumber);
-            return Convert.ToBase64String(randomNumber);
-        }
 
-        public class TokensResponse
-        {
-            public TokensResponse(string accessToken, string refreshToken)
-            {
-                if (string.IsNullOrWhiteSpace(accessToken))
-                    throw new ArgumentNullException(nameof(accessToken));
-
-                if (string.IsNullOrWhiteSpace(refreshToken))
-                    throw new ArgumentNullException(nameof(refreshToken));
-
-                AccessToken = accessToken;
-                RefreshToken = refreshToken;
-            }
-
-            public string AccessToken { get; }
-            public string RefreshToken { get; }
+            return (Convert.ToBase64String(randomNumber), expirationDate);
         }
     }
 }

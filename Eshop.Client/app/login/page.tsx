@@ -45,8 +45,7 @@ export default function LoginPage() {
         if (!backUrl) return;
 
         console.info("Refresh tokens.");
-        const result = await refreshTokens();
-        console.log(result);
+        await refreshTokens();
         window.location.href = backUrl;
         // todo redirect to back-url
       } catch (err) {

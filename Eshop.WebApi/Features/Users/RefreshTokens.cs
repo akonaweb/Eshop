@@ -31,12 +31,14 @@ namespace Eshop.WebApi.Features.Users
                 if (user == null || user.RefreshTokenExpiryDate <= dateTimeProvider.Now)
                     throw new UnauthorizedException("Invalid or expired refresh token.");
 
-                var token = await tokenManager.GetTokens(user);
+                var tokens = await tokenManager.GetTokens(user);
 
                 return new RefreshTokensResponseDto
                 {
-                    AccessToken = token.AccessToken,
-                    RefreshToken = token.RefreshToken
+                    AccessToken = tokens.AccessToken,
+                    AccessTokenExpirationDate = tokens.AccessTokenExpirationDate,
+                    RefreshToken = tokens.RefreshToken,
+                    RefreshTokenExpirationDate = tokens.RefreshTokenExpirationDate
                 };
             }
         }
@@ -45,6 +47,8 @@ namespace Eshop.WebApi.Features.Users
     public class RefreshTokensResponseDto
     {
         public required string AccessToken { get; set; }
+        public DateTime AccessTokenExpirationDate { get; set; }
         public required string RefreshToken { get; set; }
+        public DateTime RefreshTokenExpirationDate { get; set; }
     }
 }

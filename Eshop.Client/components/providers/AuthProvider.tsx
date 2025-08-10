@@ -1,7 +1,7 @@
 "use client";
 
 import theme from "@/theme";
-import { Navigation, Session } from "@toolpad/core";
+import { Navigation } from "@toolpad/core";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import { PageContainer } from "@toolpad/core/PageContainer";
 import { NextAppProvider } from "@toolpad/core/nextjs";
@@ -14,7 +14,12 @@ import {
   useState,
 } from "react";
 
-import { getSession, logout, refreshTokens } from "@/api/users";
+import {
+  ExtendedSession,
+  getSession,
+  logout,
+  refreshTokens,
+} from "@/api/users";
 import ToolbarActions from "@/components/ToolbarActions";
 import CartProvider from "@/components/providers/CartProvider";
 
@@ -23,8 +28,8 @@ const Branding = {
 };
 
 type UserContextType = {
-  session: Session | null;
-  setSession: (session: Session) => void;
+  session: ExtendedSession | null;
+  setSession: (session: ExtendedSession) => void;
 };
 
 const UserContext = createContext<UserContextType>(null!);
@@ -37,8 +42,17 @@ export interface AppAuthProviderProps {
 
 const slots = { toolbarActions: ToolbarActions };
 
+const getRefreshTime = (expirationDate: Date) => {
+  const now = Date.now();
+  const expiry = new Date(expirationDate).getTime();
+
+  let intervalMs = expiry - 1000 - now;
+
+  return intervalMs < 0 ? 60 * 1000 : intervalMs;
+};
+
 export function AuthProvider({ children, navigation }: AppAuthProviderProps) {
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<ExtendedSession | null>(null);
 
   const signIn = useCallback(() => (window.location.href = "/login"), []);
 
@@ -68,37 +82,36 @@ export function AuthProvider({ children, navigation }: AppAuthProviderProps) {
     [signIn, signOut]
   );
 
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        const data = await getSession();
-        setSession(data);
-      } catch {
-        setSession(null);
-      }
-    };
+  const fetchSession = useCallback(async () => {
+    try {
+      const data = await getSession();
+      setSession(data);
+    } catch {
+      setSession(null);
+    }
+  }, []);
 
+  useEffect(() => {
     if (session) return;
-    fetch();
-  }, [session]);
+    fetchSession();
+  }, [session, fetchSession]);
 
   useEffect(() => {
-    const interval = setInterval(
-      async () => {
-        if (!session) return;
+    if (!session?.accessTokenExpirationDate) return;
+    const refreshTime = getRefreshTime(session.accessTokenExpirationDate);
 
-        try {
-          console.info("Refresh tokens.");
-          await refreshTokens();
-        } catch (err) {
-          console.error("Token refresh failed.", err);
-        }
-      },
-      29 * 60 * 1000
-    ); // 29 minutes
+    const interval = setInterval(async () => {
+      try {
+        console.info("Refresh tokens.");
+        await refreshTokens();
+        await fetchSession();
+      } catch (err) {
+        console.error("Token refresh failed.", err);
+      }
+    }, refreshTime);
 
     return () => clearInterval(interval);
-  }, [session]);
+  }, [session, fetchSession]);
 
   return (
     <UserContext.Provider value={value}>

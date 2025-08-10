@@ -1,5 +1,4 @@
 import axios from "axios";
-import { redirect } from "next/navigation";
 
 import urls from "./urls";
 
@@ -29,16 +28,16 @@ api.interceptors.response.use(
           { withCredentials: true }
         );
 
-        return api(originalRequest);
+        window.location.href = window.location.href;
       } catch (refreshErr) {
         console.warn("Refresh token failed", refreshErr);
-        redirect("/login");
+        window.location.href = "/login";
       }
     }
 
     if (error.response?.status === 403) {
       console.warn("Access forbidden – redirecting to /forbidden");
-      redirect("/forbidden");
+      window.location.href = "/forbidden";
     }
 
     throw error.response?.data as ProblemDetails;
