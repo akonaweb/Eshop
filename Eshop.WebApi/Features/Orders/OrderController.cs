@@ -18,7 +18,7 @@ namespace Eshop.WebApi.Features.Orders
             this.mediator = mediator;
         }
 
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpGet(Name = nameof(GetOrders))]
         [ProducesResponseType(typeof(IEnumerable<GetOrdersResponseDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<GetOrdersResponseDto>>> GetOrders()
@@ -27,7 +27,7 @@ namespace Eshop.WebApi.Features.Orders
             return Ok(result);
         }
 
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpGet("{id}", Name = nameof(GetOrder))]
         [ProducesResponseType(typeof(GetOrderResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -57,7 +57,7 @@ namespace Eshop.WebApi.Features.Orders
             return CreatedAtAction(nameof(GetOrder), new { id = result.Id }, result);
         }
 
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("{id}", Name = nameof(DeleteOrder))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -68,7 +68,7 @@ namespace Eshop.WebApi.Features.Orders
             return NoContent();
         }
 
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("{id}", Name = nameof(UpdateOrder))]
         [ProducesResponseType(typeof(UpdateOrderResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
