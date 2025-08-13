@@ -1,6 +1,7 @@
 const urls = {
   category: {
     list: "category",
+    detail: (categoryId: number) => `category/${categoryId}`,
   },
   order: {
     list: "order",

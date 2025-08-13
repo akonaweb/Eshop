@@ -36,9 +36,7 @@ namespace Eshop.WebApi.Features.Products
             return Ok(result);
         }
 
-        //[Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminPolicy")]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost(Name = nameof(AddProduct))]
         [ProducesResponseType(typeof(AddProductResponseDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -50,7 +48,7 @@ namespace Eshop.WebApi.Features.Products
             return CreatedAtAction(nameof(GetProduct), new { id = result.Id }, result);
         }
 
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("{id}", Name = nameof(UpdateProduct))]
         [ProducesResponseType(typeof(UpdateProductResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -63,7 +61,7 @@ namespace Eshop.WebApi.Features.Products
             return Ok(result);
         }
 
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("{id}", Name = nameof(DeleteProduct))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]

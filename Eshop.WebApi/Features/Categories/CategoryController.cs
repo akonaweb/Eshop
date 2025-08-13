@@ -26,6 +26,7 @@ namespace Eshop.WebApi.Features.Categories
             return Ok(result);
         }
 
+        [Authorize(Policy = "AdminPolicy")]
         [HttpGet("{id}", Name = nameof(GetCategory))]
         [ProducesResponseType(typeof(GetCategoryResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -36,7 +37,7 @@ namespace Eshop.WebApi.Features.Categories
             return Ok(result);
         }
 
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost(Name = nameof(AddCategory))]
         [ProducesResponseType(typeof(AddCategoryResponseDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -46,7 +47,7 @@ namespace Eshop.WebApi.Features.Categories
             return CreatedAtAction(nameof(GetCategory), new { id = result.Id }, result);
         }
 
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("{id}", Name = nameof(UpdateCategory))]
         [ProducesResponseType(typeof(UpdateCategoryResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -57,7 +58,7 @@ namespace Eshop.WebApi.Features.Categories
             return Ok(result);
         }
 
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("{id}", Name = nameof(DeleteCategory))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
