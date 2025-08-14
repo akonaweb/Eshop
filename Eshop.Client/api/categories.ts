@@ -1,4 +1,5 @@
 import api from "./core/api";
+import apiSsr from "./core/apiSsr";
 import urls from "./core/urls";
 import useApiQuery from "./core/useApiQuery";
 
@@ -7,8 +8,8 @@ export type Category = {
   name: string;
 };
 
-export const getCategories = async (): Promise<Category[]> => {
-  const response = await api.get(urls.category.list);
+export const getCategoriesSsr = async (): Promise<Category[]> => {
+  const response = await apiSsr().get(urls.category.list);
   return response.data;
 };
 

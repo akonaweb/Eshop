@@ -8,11 +8,11 @@ import TableRow from "@mui/material/TableRow";
 import Link from "next/link";
 
 import { getSsrAccessToken } from "@/api/core/apiSsrUtils";
-import { getOrders } from "@/api/orders";
+import { getOrdersSsr } from "@/api/orders";
 
 export default async function AdminOrdersPage() {
   const accessToken = await getSsrAccessToken();
-  const orders = await getOrders(accessToken, "/admin/orders");
+  const orders = await getOrdersSsr(accessToken, "/admin/orders");
 
   return (
     <>

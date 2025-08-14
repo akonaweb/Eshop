@@ -3,12 +3,12 @@ import LinearProgress from "@mui/material/LinearProgress";
 import type { Navigation } from "@toolpad/core/AppProvider";
 import * as React from "react";
 
-import { getCategories } from "@/api/categories";
+import { getCategoriesSsr } from "@/api/categories";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import QueryProvider from "@/components/providers/QueryProvider";
 
 export default async function Layout(props: { children: React.ReactNode }) {
-  const categories = await getCategories();
+  const categories = await getCategoriesSsr();
   const navigation: Navigation = categories.map((x) => {
     return {
       segment: `products/${x.id}`,

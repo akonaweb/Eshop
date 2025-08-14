@@ -69,7 +69,7 @@ export type Order = {
   address: string;
   createdAt: Date;
 };
-export const getOrders = async (
+export const getOrdersSsr = async (
   accessToken: string,
   backUrl: string
 ): Promise<Order[]> => {
