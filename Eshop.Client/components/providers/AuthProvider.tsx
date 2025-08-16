@@ -5,6 +5,7 @@ import { Navigation } from "@toolpad/core";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import { PageContainer } from "@toolpad/core/PageContainer";
 import { NextAppProvider } from "@toolpad/core/nextjs";
+import CircularProgress from "@mui/material/CircularProgress";
 import {
   createContext,
   useCallback,
@@ -14,6 +15,7 @@ import {
   useState,
 } from "react";
 
+import { shouldRefreshTokens } from "@/api/core/api";
 import {
   ExtendedSession,
   getSession,
@@ -28,6 +30,7 @@ const Branding = {
 };
 
 type UserContextType = {
+  isLoading: boolean;
   session: ExtendedSession | null;
   setSession: (session: ExtendedSession) => void;
 };
@@ -52,8 +55,8 @@ const getRefreshTime = (expirationDate: Date) => {
 };
 
 export function AuthProvider({ children, navigation }: AppAuthProviderProps) {
+  const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState<ExtendedSession | null>(null);
-
   const signIn = useCallback(() => (window.location.href = "/login"), []);
 
   const signOut = useCallback(async () => {
@@ -68,18 +71,22 @@ export function AuthProvider({ children, navigation }: AppAuthProviderProps) {
 
   const value = useMemo(
     () => ({
+      isLoading,
       session,
       setSession,
     }),
-    [session]
+    [isLoading, session]
   );
 
   const authentication = useMemo(
-    () => ({
-      signIn,
-      signOut,
-    }),
-    [signIn, signOut]
+    () =>
+      isLoading
+        ? undefined
+        : {
+            signIn,
+            signOut,
+          },
+    [isLoading, signIn, signOut]
   );
 
   const fetchSession = useCallback(async () => {
@@ -88,11 +95,14 @@ export function AuthProvider({ children, navigation }: AppAuthProviderProps) {
       setSession(data);
     } catch {
       setSession(null);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    if (session) return;
+    if (session || shouldRefreshTokens()) return;
+
     fetchSession();
   }, [session, fetchSession]);
 
@@ -113,6 +123,22 @@ export function AuthProvider({ children, navigation }: AppAuthProviderProps) {
     return () => clearInterval(interval);
   }, [session, fetchSession]);
 
+  useEffect(() => {
+    if (!shouldRefreshTokens()) return;
+
+    const fetch = async () => {
+      try {
+        console.info("Refresh tokens.");
+        await refreshTokens();
+        await fetchSession();
+      } catch (err) {
+        console.error("Token refresh failed.", err);
+      }
+    };
+
+    fetch();
+  }, [fetchSession]);
+
   return (
     <UserContext.Provider value={value}>
       <NextAppProvider
@@ -128,7 +154,9 @@ export function AuthProvider({ children, navigation }: AppAuthProviderProps) {
             slots={slots}
             disableCollapsibleSidebar
           >
-            <PageContainer title="">{children}</PageContainer>
+            <PageContainer title="">
+              {isLoading ? <CircularProgress /> : children}
+            </PageContainer>
           </DashboardLayout>
         </CartProvider>
       </NextAppProvider>

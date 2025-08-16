@@ -140,7 +140,7 @@ namespace Eshop.WebApi.Features.Users
         {
             Response.Cookies.Append(ACCESS_TOKEN_KEY, dto.AccessToken, new CookieOptions
             {
-                HttpOnly = true, // // Note: also on FE SSR
+                HttpOnly = false,
                 Secure = false,
                 SameSite = SameSiteMode.Lax,
                 Expires = dto.AccessTokenExpirationDate,
@@ -148,7 +148,7 @@ namespace Eshop.WebApi.Features.Users
 
             Response.Cookies.Append(REFRESH_TOKEN_KEY, dto.RefreshToken, new CookieOptions
             {
-                HttpOnly = false, // Note: needed only on BE
+                HttpOnly = false,
                 Secure = false,
                 SameSite = SameSiteMode.Lax,
                 Expires = dto.RefreshTokenExpirationDate,

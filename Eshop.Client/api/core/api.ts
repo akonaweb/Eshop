@@ -2,6 +2,17 @@ import axios from "axios";
 
 import urls from "./urls";
 
+export const accessTokenKey = "accessToken";
+
+const checkCookie = (name: string) => {
+  const cookies = document.cookie.split(";").map((c) => c.trim());
+  return cookies.some((c) => c.startsWith(name + "="));
+};
+
+export const shouldRefreshTokens = () => {
+  return !checkCookie(accessTokenKey) && checkCookie("refreshToken");
+};
+
 export type ProblemDetails = {
   title: string;
   status: number;
