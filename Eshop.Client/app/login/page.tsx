@@ -35,7 +35,7 @@ const signIn: (provider: AuthProvider, formData: FormData) => void = async (
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(true);
-  const { session } = useUserContext();
+  const { isLoading: isLoadingContext, session } = useUserContext();
   const searchParams = useSearchParams();
   const backUrl = searchParams.get("back-url") ?? "";
 
@@ -58,12 +58,12 @@ export default function LoginPage() {
   }, [backUrl]);
 
   useEffect(() => {
-    if (backUrl) return;
-    setIsLoading(false);
+    if (backUrl || isLoadingContext) return;
     if (session) window.location.href = "/";
-  }, [backUrl, session]);
+    else setIsLoading(false);
+  }, [isLoadingContext, backUrl, session]);
 
-  if (isLoading) return <CircularProgress />;
+  if (isLoading || isLoadingContext) return <CircularProgress />;
 
   return (
     <SignInPage

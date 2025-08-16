@@ -5,11 +5,14 @@ import { Badge, Button } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { CartItem, useCartContext } from "./providers/CartProvider";
+import { CartItem } from "@/api/orders";
 import AdminActions from "./AdminActions";
+import { useCartContext } from "./providers/CartProvider";
+import { useUserContext } from "./providers/AuthProvider";
 
 const ToolbarActions = () => {
   const router = useRouter();
+  const { isLoading } = useUserContext();
   const { items: cartItems } = useCartContext();
   const [items, setItems] = useState<CartItem[]>([]);
 
@@ -17,7 +20,7 @@ const ToolbarActions = () => {
     setItems(cartItems);
   }, [cartItems]);
 
-  if (!items) return null;
+  if (!items || isLoading) return <>Loading... </>;
 
   return (
     <>
