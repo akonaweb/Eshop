@@ -8,7 +8,7 @@ export type ProblemDetails = {
   errors?: Record<string, string[]>;
 };
 
-const apiSsr = (accessToken: string, backUrl: string) => {
+const apiSsr = (accessToken?: string, backUrl?: string) => {
   const instance = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
     headers: {
@@ -21,7 +21,11 @@ const apiSsr = (accessToken: string, backUrl: string) => {
     async (error) => {
       const originalRequest = error.config;
 
-      if (error.response?.status === 401 && !originalRequest._retry) {
+      if (
+        backUrl &&
+        error.response?.status === 401 &&
+        !originalRequest._retry
+      ) {
         originalRequest._retry = true;
         redirect(`/login?back-url=${backUrl}`);
       }
