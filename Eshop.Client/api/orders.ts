@@ -59,7 +59,7 @@ export const addOrder = async ({
     address: customer.address,
   };
 
-  const response = await api.post(urls.order.addOrder, payload);
+  const response = await api.post(urls.order.add, payload);
   return response.data;
 };
 

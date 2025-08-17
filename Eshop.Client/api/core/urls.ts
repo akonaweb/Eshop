@@ -2,11 +2,13 @@ const urls = {
   category: {
     list: "category",
     detail: (categoryId: number) => `category/${categoryId}`,
+    add: "category",
+    update: (categoryId: number) => `category/${categoryId}`,
   },
   order: {
     list: "order",
     cart: "order/cart",
-    addOrder: "order",
+    add: "order",
   },
   product: {
     list: "product",

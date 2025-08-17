@@ -23,3 +23,15 @@ export const getCategory = async (categoryId: string): Promise<Category> => {
 export function useCategoryDetailQuery(categoryId: string) {
   return useApiQuery(["cart", categoryId], () => getCategory(categoryId));
 }
+
+export const addCategory = async (category: Category): Promise<Category> => {
+  const response = await api.post(urls.category.add, { name: category.name });
+  return response.data;
+};
+
+export const updateCategory = async (category: Category): Promise<Category> => {
+  const response = await api.put(urls.category.update(category.id), {
+    name: category.name,
+  });
+  return response.data;
+};
