@@ -1,5 +1,5 @@
 import { Category } from "./categories";
-import api from "./core/api";
+import apiSsr from "./core/apiSsr";
 import urls from "./core/urls";
 
 export type Product = {
@@ -11,9 +11,7 @@ export type Product = {
   image: string;
 };
 
-export const getProducts = async (categoryId: number): Promise<Product[]> => {
-  const response = await api.get<Product[]>(urls.product.list);
-  return response.data
-    .filter((x) => x.category.id === categoryId)
-    .map((x) => ({ ...x, image: "https://picsum.photos/300" }));
+export const getProducts = async (): Promise<Product[]> => {
+  const response = await apiSsr().get<Product[]>(urls.product.list);
+  return response.data;
 };
