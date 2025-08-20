@@ -8,7 +8,9 @@ type Props = {
 };
 export default async function ProductsPage({ params }: Props) {
   const { categoryId } = await params;
-  const products = await getProducts(Number(categoryId));
+  const products = (await getProducts())
+    .filter((x) => x.category.id === Number(categoryId))
+    .map((x) => ({ ...x, image: "https://picsum.photos/300" }));
 
   return (
     <Grid2 container spacing={3}>
